@@ -38,7 +38,7 @@ function exportProgress(){
   const payload={version:STORE,exportedAt:new Date().toISOString(),data:{}};
   keys.forEach(k=>payload.data[k]=stateLoad(k));
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='walfischbaby-droid-tycoon-progress.json';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='droid-tycoon-tracker-progress.json';a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function importProgress(file){
@@ -319,9 +319,9 @@ function renderWalDashboard(){
   const x=getXpData(), p=getAllProgress();
   const els={level:document.getElementById('playerLevel'),rank:document.getElementById('playerRank'),xp:document.getElementById('xpLabel'),next:document.getElementById('xpNext'),bar:document.getElementById('xpBar'),prog:document.getElementById('levelProgress'),mood:document.getElementById('whaleMood'),avatar:document.getElementById('whaleAvatar')};
   if(els.level)els.level.textContent=`LEVEL ${x.level}`;if(els.rank)els.rank.textContent=x.rank;if(els.xp)els.xp.textContent=`${x.xp.toLocaleString('de-DE')} XP`;if(els.next)els.next.textContent=`${100-x.into} XP bis zum nächsten Level`;if(els.bar)els.bar.style.width=x.into+'%';if(els.prog)els.prog.textContent=`${x.into} / 100 XP`;
-  const mood=x.pct>=100?'🌌 Galaktischer Wal!':x.pct>=80?'👑 Der Wal ist bereit für den Thron.':x.pct>=60?'🔥 Der Wal dreht auf!':x.pct>=40?'😎 Der Wal hat jetzt richtig Bock.':x.pct>=20?'👀 Der Wal wird langsam wach...':'😴 Der Wal schläft noch...';
+  const mood=x.pct>=100?'🌌 Galaxie vollständig gesichert!':x.pct>=80?'👑 Fast am Ziel.':x.pct>=60?'🔥 Starkes Tempo!':x.pct>=40?'😎 Gute Sammlung.':x.pct>=20?'👀 Der Fortschritt nimmt Fahrt auf.':'🚀 Sammlung gestartet.';
   if(els.mood)els.mood.textContent=mood;
-  if(els.avatar){els.avatar.textContent=x.pct>=100?'🌌🐋':x.pct>=80?'👑🐋':x.pct>=60?'🔥🐋':x.pct>=40?'😎🐋':x.pct>=20?'👀🐋':'😴🐋';els.avatar.className='whale-avatar whale-'+(x.pct>=100?'final':x.pct>=80?'royal':x.pct>=60?'fire':x.pct>=40?'cool':x.pct>=20?'awake':'sleep');}
+  if(els.avatar){els.avatar.textContent=x.pct>=100?'🌌':x.pct>=80?'👑':x.pct>=60?'🔥':x.pct>=40?'⚡':x.pct>=20?'🔎':'🚀';els.avatar.className='whale-avatar whale-'+(x.pct>=100?'final':x.pct>=80?'royal':x.pct>=60?'fire':x.pct>=40?'cool':x.pct>=20?'awake':'sleep');}
   const ids=[['mapDroids',p.d.pct],['mapFusion',p.f.pct],['mapIcons',p.i.pct],['mapRebirth',p.r.pct]];ids.forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v+'%'});
   [['tree1',x.checked>0],['tree2',p.d.done>=50],['tree3',p.f.pct===100],['tree4',p.i.pct===100],['tree5',x.pct>=99.999]].forEach(([id,on])=>{const e=document.getElementById(id);if(e)e.classList.toggle('unlocked',on)});
   const stats={statDroids:p.d.done,statFusion:p.f.done,statIcons:p.i.done,statRebirth:p.r.done,statXp:x.xp};Object.entries(stats).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=Number(v).toLocaleString('de-DE')});
@@ -333,7 +333,7 @@ function renderAchievements(ps){
   const el=document.getElementById('achievements'); if(!el)return;
   const [d,f,i]=ps; const r=getRebirthProgress(), all=p=>p.total>0&&p.done===p.total, x=getXpData();
   const secret=localStorage.getItem(STORE+'-secret')==='1';
-  const ach=[['🏅','Erster Schritt','Den ersten Eintrag abgeschlossen',d.done+f.done+i.done>0],['🤖','Droidensammler','50 Droid-Varianten abgeschlossen',d.done>=50],['⚡','Fusion Master','Alle Fusionen abgeschlossen',all(f)],['⭐','Ikonenjäger','Alle Ikonen gefunden',all(i)],['🔄','Rebirth-Meister','Alle 200 Rebirth-Stufen erledigt',all(r)],['🐋','Geheimer Wal','Das WalFischBaby-Easter-Egg gefunden',secret],['🔥','Serienjäger','Heute mindestens 3 Abschlüsse',getDailyGoal().count>=3],['👑','Galaktischer Meister','Droiden, Fusionen, Ikonen und Rebirth zu 100 %',all(d)&&all(f)&&all(i)&&all(r)]];
+  const ach=[['🏅','Erster Schritt','Den ersten Eintrag abgeschlossen',d.done+f.done+i.done>0],['🤖','Droidensammler','50 Droid-Varianten abgeschlossen',d.done>=50],['⚡','Fusion Master','Alle Fusionen abgeschlossen',all(f)],['⭐','Ikonenjäger','Alle Ikonen gefunden',all(i)],['🔄','Rebirth-Meister','Alle 200 Rebirth-Stufen erledigt',all(r)],['🔐','Geheimnis entdeckt','Das versteckte Easter-Egg gefunden',secret],['🔥','Serienjäger','Heute mindestens 3 Abschlüsse',getDailyGoal().count>=3],['👑','Galaktischer Meister','Droiden, Fusionen, Ikonen und Rebirth zu 100 %',all(d)&&all(f)&&all(i)&&all(r)]];
   el.innerHTML=ach.map(a=>`<article class="achievement ${a[3]?'unlocked':'locked'}"><span>${a[3]?a[0]:'🔒'}</span><div><b>${a[1]}</b><small>${a[2]}</small></div>${a[3]?'<strong>✓</strong>':'<em>???</em>'}</article>`).join('');
 }
 function initWalDashboard(){
@@ -354,7 +354,7 @@ function renderEventRadar(){
   el.innerHTML=shown.map((x,i)=>`<div class="radar-row ${i===0?'radar-next':''}"><span class="radar-icon">${x.icon}</span><div><b>${x.name}</b><small>${x.type==='event'?'MINI-EVENT':'BLUEPRINT-DROP'} · ${x.detail}</small></div><strong>${formatShortCountdown(x.time-now)}</strong></div>`).join('');
 }
 function formatShortCountdown(ms){const s=Math.max(0,Math.floor(ms/1000)),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;return d?`${d}T ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`}
-function resetAllProgress(){if(!confirm('Wirklich ALLE WalFischBaby-Fortschritte, Achievements und Einstellungen auf diesem Gerät löschen?'))return;['droids','fusionen','icons','rebirth','rebirth-c1','rebirth-c2','rebirth-c3','rebirth-c4','rebirth-c5','activity','secret','sound','checklist-settings','home-clean'].forEach(k=>localStorage.removeItem(STORE+'-'+k));location.reload();}
+function resetAllProgress(){if(!confirm('Wirklich ALLE Tracker-Fortschritte, Achievements und Einstellungen auf diesem Gerät löschen?'))return;['droids','fusionen','icons','rebirth','rebirth-c1','rebirth-c2','rebirth-c3','rebirth-c4','rebirth-c5','activity','secret','sound','checklist-settings','home-clean'].forEach(k=>localStorage.removeItem(STORE+'-'+k));location.reload();}
 
 function initHomeCleanMode(){
   const btn=document.getElementById('homeCleanToggle'), advanced=document.getElementById('advancedHome'); if(!btn||!advanced)return;
@@ -395,7 +395,7 @@ function renderNextMission(){
   else if(f.pct<100)m={tag:'FUSIONSLABOR',title:`Noch ${f.total-f.done} Varianten offen`,desc:'Die nächste Fusion wartet bereits auf ihre Zutaten.',url:'fusionen.html'};
   else if(i.pct<100)m={tag:'IKONEN-TRESOR',title:`Noch ${i.total-i.done} Ikonen fehlen`,desc:'Nur noch wenige Einträge bis zum vollständigen Tresor.',url:'ikonen.html'};
   else if(r.pct<100)m={tag:'REBIRTH-PROTOKOLL',title:`Noch ${r.total-r.done} Schritte offen`,desc:'Deine nächste große Reise beginnt im Rebirth-Protokoll.',url:'rebirth.html'};
-  else m={tag:'GALAKTISCHER MEISTER',title:'Die komplette Galaxie ist gesichert',desc:'100 % erreicht. Du hast den WalFischBaby-Tycoon-Modus geknackt.',url:'index.html'};
+  else m={tag:'GALAKTISCHER MEISTER',title:'Die komplette Galaxie ist gesichert',desc:'100 % erreicht. Du hast den Tracker vollständig abgeschlossen.',url:'index.html'};
   el.innerHTML=`<span class="mission-tag">${m.tag}</span><h3>${m.title}</h3><p>${m.desc}</p><a class="mission-btn" href="${m.url}">MISSION STARTEN →</a>`;
 }
 function initDropTimers(){
@@ -406,7 +406,7 @@ function initDropTimers(){
   function nextFor(mins,now){const y=now.getFullYear(),mo=now.getMonth(),d=now.getDate(),h=now.getHours();for(let hour=0;hour<3;hour++)for(const m of mins){const t=new Date(y,mo,d,h+hour,m,0,0);if(t>now)return t;}return new Date(y,mo,d,h+3,mins[0],0,0);}
   function fmt(ms){const s=Math.max(0,Math.floor(ms/1000)),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return (h?String(h).padStart(2,'0')+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
   function tick(){const now=new Date();root.querySelectorAll('[data-drop]').forEach(card=>{const key=card.dataset.drop,t=nextFor(schedules[key],now),ms=t-now,mins=schedules[key],due=mins.includes(now.getMinutes())&&now.getSeconds()<2,dueStamp=new Date(now.getFullYear(),now.getMonth(),now.getDate(),now.getHours(),now.getMinutes(),0,0).getTime();card.querySelector('.drop-count').textContent=fmt(ms);card.querySelector('.drop-next').textContent=`NÄCHSTER ${labels[key]}-DROP // ${t.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}`;card.classList.toggle('drop-live',due);if(due&&lastDrop[key]!==dueStamp){lastDrop[key]=dueStamp;triggerDrop(labels[key]);}});}
-  function triggerDrop(name){const notice=document.getElementById('dropNotice');if(notice){notice.textContent=`⚡ ${name}-DROP JETZT DA // WALFISCHBABY-SIGNAL`;notice.classList.add('show');setTimeout(()=>notice.classList.remove('show'),8000);}document.title=`⚡ ${name}-DROP // WalFischBaby`;setTimeout(()=>{document.title='WalFischBaby | Droiden-Zentrale'},5000);if('Notification'in window&&Notification.permission==='granted'){try{new Notification(`${name}-Drop ist da!`,{body:`Der ${name}-Blueprint-Drop ist jetzt aktiv.`})}catch{}}try{const C=window.AudioContext||window.webkitAudioContext;if(C){const c=new C(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.5);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.5)}}catch{}}
+  function triggerDrop(name){const notice=document.getElementById('dropNotice');if(notice){notice.textContent=`⚡ ${name}-DROP JETZT DA // TRACKER-SIGNAL`;notice.classList.add('show');setTimeout(()=>notice.classList.remove('show'),8000);}document.title=`⚡ ${name}-DROP // Droid Tycoon Tracker`;setTimeout(()=>{document.title='Droid Tycoon Tracker'},5000);if('Notification'in window&&Notification.permission==='granted'){try{new Notification(`${name}-Drop ist da!`,{body:`Der ${name}-Blueprint-Drop ist jetzt aktiv.`})}catch{}}try{const C=window.AudioContext||window.webkitAudioContext;if(C){const c=new C(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.5);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.5)}}catch{}}
   const bell=document.getElementById('enableAlerts');if(bell)bell.addEventListener('click',async()=>{if('Notification'in window){try{const permission=await Notification.requestPermission();bell.textContent=permission==='granted'?'🔔 ALARME AKTIV':'🔕 ALARM NUR AUF SEITE'}catch{bell.textContent='🔕 ALARM NUR AUF SEITE'}}else bell.textContent='🔕 BROWSER-ALARM NICHT VERFÜGBAR';});
   tick();setInterval(tick,1000);
 }

@@ -132,3 +132,16 @@ body{background:radial-gradient(circle at 15% 5%,rgba(17,232,255,.11),transparen
 .rebirth-guide-details{margin-top:8px;border:1px solid #1c3557;border-radius:12px;background:rgba(3,9,20,.6);overflow:hidden}.rebirth-guide-details summary{padding:12px 14px;cursor:pointer;color:#bcd5e8;font-weight:900;font-size:12px}.rebirth-guide-details[open] summary{border-bottom:1px solid #1c3557;color:#fff}
 @media(max-width:900px){.rebirth-checklist{grid-template-columns:repeat(8,1fr)}}
 @media(max-width:650px){.checklist-modebar{font-size:10px}.rebirth-controls .btn{margin-left:0;width:100%}.rebirth-checklist{grid-template-columns:repeat(5,1fr);gap:6px}.rebirth-check{padding:9px 6px}.rebirth-check-mark{font-size:16px}.advanced-home.collapsed-home:before{font-size:11px;line-height:1.5}}
+/* v2.4 neutral tracker presentation */
+.hero:after{display:none}
+.brand img{width:52px;height:42px;opacity:.82}
+.brand small{color:#b8c6d8;text-shadow:none}
+.nav>a:not(.brand):hover,.nav>a.active{background:rgba(255,255,255,.035);box-shadow:none}
+.hero h1{background:linear-gradient(90deg,#e9f2ff,#9fb5cc 55%,#d9e5f2);-webkit-background-clip:text;background-clip:text}
+.progress i{background:linear-gradient(90deg,#7dd3fc,#93c5fd,#c4b5fd)}
+.rebirth-tabs{justify-content:flex-start}
+.rebirth-tab{background:#0a1322;border-color:#29415f;color:#b9c9dc;box-shadow:none}
+.rebirth-tab:hover,.rebirth-tab.active{border-color:#7dd3fc;color:#fff;box-shadow:0 0 12px rgba(125,211,252,.12);background:#101d2e}
+.rebirth-panel{border-color:#263d58;background:rgba(5,12,22,.78);box-shadow:0 12px 32px rgba(0,0,0,.2)}
+.rebirth-panel-head h2{background:none;color:#eef5ff;-webkit-text-fill-color:initial}
+.rebirth-image-wrap{background:#050b14;border-color:#1f344c}
