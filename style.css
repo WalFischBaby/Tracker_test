@@ -230,3 +230,22 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;bac
 .migration-summary span{font:800 8px ui-monospace;letter-spacing:.12em;color:#7891a8}.migration-summary b{font:900 11px ui-monospace;color:#eafaff}
 .migration-footnote{display:block;margin-top:11px;color:#7891a8;line-height:1.4}
 @media(max-width:650px){.migration-summary{grid-template-columns:1fr 1fr}}
+
+/* V2.1 FINAL — GitHub Pages hardening + dark control contract */
+html{background:#030712;color-scheme:dark}body{overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+button,.btn,.mission-btn,.release-primary,.rebirth-tab,.danger-btn,.assistant-actions button,.assistant-head button,.feedback-actions button,.update-actions button,.cloud-hud button,.cloud-link,.social-links a,.rebirth-cycle-links a,label.btn{
+  background:#081321!important;color:#e8f6ff!important;border-color:rgba(111,231,255,.32)!important;text-shadow:none!important;
+}
+button:hover,.btn:hover,.mission-btn:hover,.release-primary:hover,.rebirth-tab:hover,.rebirth-tab.active,.assistant-actions button:hover,.cloud-hud button:hover,.social-links a:hover,.rebirth-cycle-links a:hover,label.btn:hover{
+  background:#0d2033!important;color:#fff!important;border-color:#6fe7ff!important;
+}
+button:focus-visible,.btn:focus-visible,.mission-btn:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #6fe7ff;outline-offset:2px}
+.danger-btn,.danger-account{background:#211019!important;color:#ffb4c0!important;border-color:rgba(255,90,110,.42)!important}
+.cloud-link{background:transparent!important;color:#8cecff!important;border:0!important}
+.check:checked{color:#fff!important}.tracker th.variant-head{color:#08111c!important}
+img{max-width:100%;height:auto}.rebirth-guide{width:100%;height:auto}
+.nav,.terminal-rail,.mobile-bottom-nav{box-sizing:border-box}
+@media(max-width:1100px){.terminal-rail{display:none!important}.terminal-v3 .wrap,.terminal-v3 header{margin-left:0!important}.cloud-hud{left:12px!important}.command-grid,.home-columns{grid-template-columns:1fr}.hero-grid{grid-template-columns:1fr}.terminal-core{max-width:320px}.drop-timers{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:850px){header .nav{display:none!important}.mobile-bottom-nav{display:flex!important}.wrap{width:min(100% - 18px,1500px)!important;padding-top:12px}.hero,.home-box,.overall-card,.radar-box,.drop-zone,.player-panel{box-sizing:border-box;max-width:100%}.drop-timers{grid-template-columns:1fr}.cloud-dialog,.release-dialog{max-width:calc(100vw - 20px)!important;max-height:calc(100vh - 24px);overflow:auto}.migration-summary,.cloud-overview{grid-template-columns:1fr 1fr}.assistant-toggle{bottom:142px!important}.droid-assistant{left:10px!important;right:10px!important;width:auto!important;bottom:198px!important}}
+@media(max-width:520px){.migration-summary,.cloud-overview{grid-template-columns:1fr}.hero{padding:18px}.hero-actions,.smart-actions,.cloud-auth-actions,.cloud-account-actions{display:grid!important;grid-template-columns:1fr!important}.hero-actions>*{width:100%;box-sizing:border-box;text-align:center}.mobile-bottom-nav{overflow-x:auto;justify-content:flex-start}.mobile-bottom-nav a{min-width:58px}.cloud-hud{right:10px!important;max-width:none!important;justify-content:space-between}.cloud-hud span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.backup-bar>*{width:100%;box-sizing:border-box;text-align:center}}

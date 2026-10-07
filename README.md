@@ -19,3 +19,10 @@ V2.1 RELEASE CANDIDATE
 - Datenschutz-/Cloud-Erklärung in der Account-Zentrale.
 - Release-Oberfläche ohne sichtbare RC4-Entwicklerlabels.
 - Sync-Engine basiert unverändert auf dem bestätigten Item-Sync + Offline-Pending-Queue.
+
+## V2.1 FINAL – GitHub Pages Hinweise
+- Alle internen Seiten-/Asset-Pfade sind repository-relativ (`./...`).
+- CSS/JS erhalten `?v=2.1-final`, damit GitHub/CDN/Browser keine alte Oberfläche aus dem Cache anzeigen.
+- Globale Dark-Control-Regel: keine hellen Aktionsbuttons mehr.
+- Responsive Hardening: Desktop-Rail wird auf kleineren Viewports entfernt; mobile Bottom-Navigation übernimmt.
+- Für GitHub Pages den INHALT dieses Ordners in den veröffentlichten Branch/Ordner kopieren, sodass `index.html` direkt im Pages-Root des Repositories liegt.
