@@ -26,3 +26,8 @@ V2.1 RELEASE CANDIDATE
 - Globale Dark-Control-Regel: keine hellen Aktionsbuttons mehr.
 - Responsive Hardening: Desktop-Rail wird auf kleineren Viewports entfernt; mobile Bottom-Navigation übernimmt.
 - Für GitHub Pages den INHALT dieses Ordners in den veröffentlichten Branch/Ordner kopieren, sodass `index.html` direkt im Pages-Root des Repositories liegt.
+
+
+V2.1 FINAL + Discord OAuth: Discord ist als zusätzliche optionale Login-Methode integriert.
+
+V2.1 FINAL + Google OAuth: Google ist zusätzlich zu Discord und E-Mail/Passwort als optionale Login-Methode integriert.

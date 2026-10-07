@@ -263,3 +263,16 @@ img{max-width:100%;height:auto}.rebirth-guide{width:100%;height:auto}
 }
 :where(.danger-btn,.danger-account){background:#211019!important;background-image:none!important;color:#ffc0ca!important;border-color:rgba(255,90,110,.44)!important}
 :where(button,.btn,.mission-btn)[disabled]{background:#0a111b!important;color:#718194!important;border-color:#1d3042!important;opacity:.72!important}
+
+
+/* V2.1 Discord OAuth */
+.discord-login-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 14px!important;border-radius:12px!important;background:linear-gradient(180deg,#15192b,#0c1020)!important;color:#f3f5ff!important;border:1px solid rgba(145,157,255,.42)!important;font:900 11px ui-monospace,SFMono-Regular,monospace!important;letter-spacing:.07em;cursor:pointer}
+.discord-login-btn:hover{background:#1a2036!important;border-color:#9ba8ff!important;box-shadow:0 0 20px rgba(88,101,242,.14)!important}
+.discord-mark{display:grid;place-items:center;width:23px;height:23px;border-radius:7px;background:#202641!important;color:#b9c2ff!important;font-size:14px}
+.cloud-auth-divider{display:flex;align-items:center;gap:10px;color:#60778d;font:800 8px ui-monospace,SFMono-Regular,monospace;letter-spacing:.16em}
+.cloud-auth-divider:before,.cloud-auth-divider:after{content:"";height:1px;flex:1;background:rgba(111,231,255,.12)}
+
+/* V2.1 Google OAuth */
+.google-login-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 14px!important;margin-bottom:8px;border-radius:12px!important;background:linear-gradient(180deg,#151a20,#0b1015)!important;color:#f5f7fa!important;border:1px solid rgba(180,195,210,.36)!important;font:900 11px ui-monospace,SFMono-Regular,monospace!important;letter-spacing:.07em;cursor:pointer}
+.google-login-btn:hover{background:#182029!important;border-color:#d5e2ec!important;box-shadow:0 0 20px rgba(210,225,235,.10)!important}
+.google-mark{display:grid;place-items:center;width:23px;height:23px;border-radius:7px;background:#202832!important;color:#f5f7fa!important;font:900 14px Arial,sans-serif}
