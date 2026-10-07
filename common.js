@@ -17,6 +17,7 @@ const VARIANT_COLORS={
 
 const slug=s=>String(s).toUpperCase().replaceAll(' ','-').replaceAll('Ä','AE').replaceAll('Ö','OE').replaceAll('Ü','UE');
 function setupNav(page){
+  document.body.dataset.section=page;
   document.querySelectorAll('[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
 }
 function stateLoad(key){
@@ -34,23 +35,36 @@ function recordActivity(category,label,checked){
   }catch{}
 }
 function exportProgress(){
-  const keys=['droids','fusionen','icons','rebirth'];
-  const payload={version:STORE,exportedAt:new Date().toISOString(),data:{}};
-  keys.forEach(k=>payload.data[k]=stateLoad(k));
+  const storage={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('wfb-droid-tycoon-'))storage[k]=localStorage.getItem(k);}
+  const payload={format:'droid-tycoon-tracker-backup',version:STORE,exportedAt:new Date().toISOString(),storage};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='droid-tycoon-tracker-progress.json';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`droid-tycoon-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 function importProgress(file){
   return new Promise((resolve,reject)=>{
     const r=new FileReader();
     r.onload=()=>{try{
-      const p=JSON.parse(r.result); if(!p||!p.data) throw new Error('Ungültige Datei');
-      ['droids','fusionen','icons','rebirth'].forEach(k=>{if(p.data[k]&&typeof p.data[k]==='object')stateSave(k,p.data[k])});
+      const p=JSON.parse(r.result);
+      if(p&&p.storage&&typeof p.storage==='object'){
+        Object.entries(p.storage).forEach(([k,v])=>{if(k.startsWith('wfb-droid-tycoon-')&&typeof v==='string')localStorage.setItem(k,v)});
+      }else if(p&&p.data){
+        ['droids','fusionen','icons','favorites'].forEach(k=>{if(p.data[k]&&typeof p.data[k]==='object')stateSave(k,p.data[k])});
+      }else throw new Error('Ungültige Datei');
       resolve(true);
     }catch(e){reject(e)}};
-    r.onerror=()=>reject(r.error); r.readAsText(file);
+    r.onerror=()=>reject(r.error);r.readAsText(file);
   });
+}
+
+function initLegacyCompatibility(){
+  const el=document.getElementById('legacyCompatibility'); if(!el)return;
+  const keys=['droids','fusionen','icons'];
+  const found=keys.filter(k=>localStorage.getItem(STORE+'-'+k)!==null);
+  const backup=localStorage.getItem(STORE+'-backup-reminder-dismissed');
+  el.innerHTML=`<div><b>✓ v1.5-KOMPATIBEL</b><span>${found.length?`Vorhandener Fortschritt erkannt: ${found.length}/3 Sammlungsbereiche.`:'Die Speicherstruktur von v1.5 wird direkt weiterverwendet.'}</span></div><button class="btn legacy-backup-btn" type="button">⬇ JETZT SICHERN</button>`;
+  const b=el.querySelector('.legacy-backup-btn'); if(b)b.addEventListener('click',exportProgress);
 }
 function formatActivityTime(ts){
   const d=new Date(ts), now=new Date(), diff=now-ts;
@@ -102,10 +116,9 @@ function renderHomeProgress(){
   setHomeProgress('homeFusionen',getTrackerProgress('fusionen',D.fusionDroids,D.variants));
   setHomeProgress('homeIkonen',getIconProgress(D.icons));
   const ps=[getTrackerProgress('droids',D.droids,D.variants),getTrackerProgress('fusionen',D.fusionDroids,D.variants),getIconProgress(D.icons)];
-  const rb=getRebirthProgress();
-  const done=ps.reduce((a,p)=>a+p.done,0)+rb.done, total=ps.reduce((a,p)=>a+p.total,0)+rb.total, pct=total?Math.round(done/total*100):0;
-  const chips={droids:document.getElementById('chipDroids'),fusion:document.getElementById('chipFusion'),icons:document.getElementById('chipIcons'),rebirth:document.getElementById('chipRebirth')};
-  if(chips.droids)chips.droids.textContent=`🤖 Droiden ${ps[0].pct}%`; if(chips.fusion)chips.fusion.textContent=`⚡ Fusionen ${ps[1].pct}%`; if(chips.icons)chips.icons.textContent=`⭐ Ikonen ${ps[2].pct}%`; if(chips.rebirth)chips.rebirth.textContent=`🔄 Rebirth ${rb.pct}%`;
+  const done=ps.reduce((a,p)=>a+p.done,0), total=ps.reduce((a,p)=>a+p.total,0), pct=total?Math.round(done/total*100):0;
+  const chips={droids:document.getElementById('chipDroids'),fusion:document.getElementById('chipFusion'),icons:document.getElementById('chipIcons')};
+  if(chips.droids)chips.droids.textContent=`🤖 Droiden ${ps[0].pct}%`; if(chips.fusion)chips.fusion.textContent=`⚡ Fusionen ${ps[1].pct}%`; if(chips.icons)chips.icons.textContent=`⭐ Ikonen ${ps[2].pct}%`;
   const overallDone=document.getElementById('homeOverallDone'),overallPct=document.getElementById('homeOverallPct'),overallBar=document.getElementById('homeOverallBar');
   if(overallDone) overallDone.textContent=`${done}/${total} Einträge abgeschlossen`;
   if(overallPct) overallPct.textContent=pct+'%'; if(overallBar) overallBar.style.width=pct+'%';
@@ -113,6 +126,7 @@ function renderHomeProgress(){
   renderAchievements(ps); renderActivity();
   if(document.getElementById('nextMission')) renderNextMission();
   if(document.getElementById('commanderStatus')) renderCommanderStatus();
+  if(document.getElementById('nextGoals')) renderNextGoals();
 }
 function renderAchievements(ps){
   const el=document.getElementById('achievements'); if(!el)return;
@@ -133,6 +147,11 @@ function renderActivity(){
   }catch{el.innerHTML='<li class="empty-activity">Noch keine neuen Abschlüsse in diesem Browser.</li>'}
 }
 
+function favoriteLoad(){return stateLoad('favorites')}
+function favoriteKey(kind,name){return kind+'|'+name}
+function favoriteButton(kind,name){const fav=favoriteLoad(), key=favoriteKey(kind,name), on=!!fav[key];return `<button class="favorite-btn ${on?'is-favorite':''}" type="button" data-favorite-kind="${esc(kind)}" data-favorite-name="${esc(name)}" title="${on?'Aus nächsten Zielen entfernen':'Zu meinen nächsten Zielen hinzufügen'}" aria-label="Favorit">${on?'★':'☆'}</button>`}
+function bindFavoriteButtons(root,rerender){root.querySelectorAll('.favorite-btn').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const fav=favoriteLoad(),key=favoriteKey(btn.dataset.favoriteKind,btn.dataset.favoriteName);if(fav[key])delete fav[key];else fav[key]=true;stateSave('favorites',fav);rerender();}))}
+
 function renderTracker(kind,items,variants){
   const body=document.getElementById('trackerBody'), state=stateLoad(kind);
   const search=document.getElementById('search'), type=document.getElementById('type'), rarity=document.getElementById('rarity');
@@ -140,6 +159,15 @@ function renderTracker(kind,items,variants){
   if(search && urlQ) search.value=urlQ;
   const hideComplete=document.getElementById('hideComplete');
   const hideMakellosOnly=document.getElementById('hideMakellosOnly');
+  const toolbar=document.querySelector('.toolbar');
+  let smartMode='all';
+  if(toolbar && !document.getElementById('smartFavorites')){
+    const favBtn=document.createElement('button');favBtn.type='button';favBtn.id='smartFavorites';favBtn.className='btn smart-filter';favBtn.textContent='★ FAVORITEN';
+    const nearBtn=document.createElement('button');nearBtn.type='button';nearBtn.id='smartNear';nearBtn.className='btn smart-filter';nearBtn.textContent='🔥 FAST FERTIG';
+    toolbar.insertBefore(favBtn,toolbar.querySelector('#reset')||null);toolbar.insertBefore(nearBtn,toolbar.querySelector('#reset')||null);
+    favBtn.addEventListener('click',()=>{smartMode=smartMode==='favorites'?'all':'favorites';favBtn.classList.toggle('active',smartMode==='favorites');nearBtn.classList.remove('active');render()});
+    nearBtn.addEventListener('click',()=>{smartMode=smartMode==='near'?'all':'near';nearBtn.classList.toggle('active',smartMode==='near');favBtn.classList.remove('active');render()});
+  }
 
   [...new Set(items.map(x=>x.type))].filter(Boolean).sort().forEach(x=>type.insertAdjacentHTML('beforeend',`<option>${esc(x)}</option>`));
   [...new Set(items.map(x=>x.rarity))].filter(Boolean).forEach(x=>rarity.insertAdjacentHTML('beforeend',`<option>${esc(x)}</option>`));
@@ -161,6 +189,9 @@ function renderTracker(kind,items,variants){
       if(rv!=='all' && it.rarity!==rv) return false;
       if(hideComplete?.checked && isComplete(it,it.idx)) return false;
       if(hideMakellosOnly?.checked && onlyMakellosMissing(it,it.idx)) return false;
+      const missing=variants.filter(v=>!state[it.name+'#'+it.idx+'|'+v]).length;
+      if(smartMode==='favorites' && !favoriteLoad()[favoriteKey(kind,it.name)]) return false;
+      if(smartMode==='near' && !(missing>0 && missing<=2)) return false;
       return true;
     });
 
@@ -169,7 +200,7 @@ function renderTracker(kind,items,variants){
       const done=isComplete(it,it.idx);
       return `<tr id="row-${slug(it.name)}" class="${done?'row-complete':''}">
         <td class="sticky droidcell">
-          <div class="name">${esc(it.name)}</div>
+          <div class="item-name-line"><div class="name">${esc(it.name)}</div>${favoriteButton(kind,it.name)}</div>
           <div class="badges">
             ${badge(it.rarity,getRarityColor(it.rarity),'rarity-box')}
             ${badge(it.type,getTypeColor(it.type),'type-box')}
@@ -183,6 +214,7 @@ function renderTracker(kind,items,variants){
       </tr>`;
     }).join('');
 
+    bindFavoriteButtons(body,render);
     body.querySelectorAll('.check').forEach(cb=>cb.addEventListener('change',()=>{
       state[cb.dataset.key+'|'+cb.dataset.v]=cb.checked;
       if(cb.checked) recordActivity(kind==='droids'?'Droid':'Fusion',cb.dataset.key.split('#')[0]+' – '+cb.dataset.v,true);
@@ -222,13 +254,16 @@ function renderIcons(items){
     const label=document.createElement('label'); label.className='filter-check'; label.innerHTML='<input type="checkbox" id="hideComplete"><span>✓ GESICHERTE AUSBLENDEN</span>'; toolbar.insertBefore(label,document.getElementById('reset'));
   }
   const hideComplete=document.getElementById('hideComplete');
+  let smartMode='all';
+  if(toolbar&&!document.getElementById('smartFavorites')){const b=document.createElement('button');b.type='button';b.id='smartFavorites';b.className='btn smart-filter';b.textContent='★ FAVORITEN';toolbar.insertBefore(b,toolbar.querySelector('#reset')||null);b.addEventListener('click',()=>{smartMode=smartMode==='favorites'?'all':'favorites';b.classList.toggle('active',smartMode==='favorites');render()});}
   function render(){
     const q=(search?.value||'').toLowerCase().trim();
-    const shown=items.map((it,idx)=>({...it,idx})).filter(it=>{const checked=!!state[it.name+'#'+it.idx];return (!q||it.name.toLowerCase().includes(q))&&(!hideComplete?.checked||!checked)});
+    const shown=items.map((it,idx)=>({...it,idx})).filter(it=>{const checked=!!state[it.name+'#'+it.idx];return (!q||it.name.toLowerCase().includes(q))&&(!hideComplete?.checked||!checked)&&(smartMode!=='favorites'||favoriteLoad()[favoriteKey('icons',it.name)])});
     body.innerHTML=shown.map(it=>{
       const key=it.name+'#'+it.idx, checked=!!state[key];
-      return `<tr id="icon-${slug(it.name)}" class="${checked?'row-complete':''}"><td class="sticky droidcell"><div class="name">${esc(it.name)}</div><div class="badges">${badge(it.type,getTypeColor(it.type),'type-box')}</div></td><td class="check-cell"><input aria-label="${esc(it.name)} vorhanden" class="check" style="--vcolor:#11e8ff" type="checkbox" data-key="${esc(key)}" ${checked?'checked':''}><span class="check-label">VORHANDEN</span></td></tr>`;
+      return `<tr id="icon-${slug(it.name)}" class="${checked?'row-complete':''}"><td class="sticky droidcell"><div class="item-name-line"><div class="name">${esc(it.name)}</div>${favoriteButton('icons',it.name)}</div><div class="badges">${badge(it.type,getTypeColor(it.type),'type-box')}</div></td><td class="check-cell"><input aria-label="${esc(it.name)} vorhanden" class="check" style="--vcolor:#11e8ff" type="checkbox" data-key="${esc(key)}" ${checked?'checked':''}><span class="check-label">VORHANDEN</span></td></tr>`;
     }).join('');
+    bindFavoriteButtons(body,render);
     body.querySelectorAll('.check').forEach(cb=>cb.addEventListener('change',()=>{state[cb.dataset.key]=cb.checked;if(cb.checked)recordActivity('Ikone',cb.dataset.key.split('#')[0],true);stateSave('icons',state);update();render();renderHomeProgress?.();}));
     update();
   }
@@ -302,16 +337,16 @@ function initRebirthPage(){
 
 
 function getAllProgress(){
-  const d=getTrackerProgress('droids',D.droids,D.variants), f=getTrackerProgress('fusionen',D.fusionDroids,D.variants), i=getIconProgress(D.icons), r=getRebirthProgress();
-  return {d,f,i,r};
+  const d=getTrackerProgress('droids',D.droids,D.variants), f=getTrackerProgress('fusionen',D.fusionDroids,D.variants), i=getIconProgress(D.icons);
+  return {d,f,i};
 }
 function getXpData(){
-  const {d,f,i,r}=getAllProgress();
-  const checked=d.done+f.done+i.done+r.done;
-  const xp=checked*25 + Math.floor(d.done/10)*100 + Math.floor(f.done/10)*150 + Math.floor(i.done/5)*200 + Math.floor(r.done/5)*300;
+  const {d,f,i}=getAllProgress();
+  const checked=d.done+f.done+i.done;
+  const xp=checked*25 + Math.floor(d.done/10)*100 + Math.floor(f.done/10)*150 + Math.floor(i.done/5)*200;
   const level=Math.floor(xp/100)+1, into=xp%100;
   const ranks=[[0,'ANFÄNGER'],[10,'DROIDEN-SCOUT'],[30,'FUSIONS-TECHNIKER'],[50,'GALAXIE-SAMMLER'],[75,'DROID-TYCOON'],[100,'GALAKTISCHER MEISTER']];
-  const pct=(d.done+f.done+i.done+r.done)/Math.max(1,d.total+f.total+i.total+r.total)*100;
+  const pct=(d.done+f.done+i.done)/Math.max(1,d.total+f.total+i.total)*100;
   let rank='ANFÄNGER';ranks.forEach(x=>{if(pct>=x[0])rank=x[1]});
   return {xp,level,into,rank,checked,pct};
 }
@@ -322,18 +357,18 @@ function renderWalDashboard(){
   const mood=x.pct>=100?'🌌 Galaxie vollständig gesichert!':x.pct>=80?'👑 Fast am Ziel.':x.pct>=60?'🔥 Starkes Tempo!':x.pct>=40?'😎 Gute Sammlung.':x.pct>=20?'👀 Der Fortschritt nimmt Fahrt auf.':'🚀 Sammlung gestartet.';
   if(els.mood)els.mood.textContent=mood;
   if(els.avatar){els.avatar.textContent=x.pct>=100?'🌌':x.pct>=80?'👑':x.pct>=60?'🔥':x.pct>=40?'⚡':x.pct>=20?'🔎':'🚀';els.avatar.className='whale-avatar whale-'+(x.pct>=100?'final':x.pct>=80?'royal':x.pct>=60?'fire':x.pct>=40?'cool':x.pct>=20?'awake':'sleep');}
-  const ids=[['mapDroids',p.d.pct],['mapFusion',p.f.pct],['mapIcons',p.i.pct],['mapRebirth',p.r.pct]];ids.forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v+'%'});
+  const ids=[['mapDroids',p.d.pct],['mapFusion',p.f.pct],['mapIcons',p.i.pct]];ids.forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v+'%'});
   [['tree1',x.checked>0],['tree2',p.d.done>=50],['tree3',p.f.pct===100],['tree4',p.i.pct===100],['tree5',x.pct>=99.999]].forEach(([id,on])=>{const e=document.getElementById(id);if(e)e.classList.toggle('unlocked',on)});
-  const stats={statDroids:p.d.done,statFusion:p.f.done,statIcons:p.i.done,statRebirth:p.r.done,statXp:x.xp};Object.entries(stats).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=Number(v).toLocaleString('de-DE')});
+  const stats={statDroids:p.d.done,statFusion:p.f.done,statIcons:p.i.done,statXp:x.xp};Object.entries(stats).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=Number(v).toLocaleString('de-DE')});
   const ac=document.querySelectorAll('#achievements .unlocked').length, ae=document.getElementById('statAchievements');if(ae)ae.textContent=ac;
   const goal=getDailyGoal();const gp=document.getElementById('dailyGoalProgress'),gb=document.getElementById('dailyGoalBar'),gt=document.getElementById('dailyGoalText'),gh=document.getElementById('dailyGoalHint');if(gp)gp.textContent=`${goal.count} / 3`;if(gb)gb.style.width=Math.min(100,goal.count/3*100)+'%';if(gt)gt.textContent=goal.count>=3?'Tagesziel geschafft! 🐋':'Sammle heute noch '+(3-goal.count)+' Abschluss'+(3-goal.count===1?'':'e')+' für deinen Tagesbonus.';if(gh)gh.textContent=goal.count>=3?'Bonus gesichert – morgen wartet das nächste Ziel.':'3 Abschlüsse für den Tagesbonus';
 }
 function getDailyGoal(){const day=new Date().toISOString().slice(0,10);let list=[];try{list=JSON.parse(localStorage.getItem(STORE+'-activity')||'[]')}catch{}return {day,count:list.filter(x=>new Date(x.time).toISOString().slice(0,10)===day).length};}
 function renderAchievements(ps){
   const el=document.getElementById('achievements'); if(!el)return;
-  const [d,f,i]=ps; const r=getRebirthProgress(), all=p=>p.total>0&&p.done===p.total, x=getXpData();
+  const [d,f,i]=ps; const all=p=>p.total>0&&p.done===p.total, x=getXpData();
   const secret=localStorage.getItem(STORE+'-secret')==='1';
-  const ach=[['🏅','Erster Schritt','Den ersten Eintrag abgeschlossen',d.done+f.done+i.done>0],['🤖','Droidensammler','50 Droid-Varianten abgeschlossen',d.done>=50],['⚡','Fusion Master','Alle Fusionen abgeschlossen',all(f)],['⭐','Ikonenjäger','Alle Ikonen gefunden',all(i)],['🔄','Rebirth-Meister','Alle 200 Rebirth-Stufen erledigt',all(r)],['🔐','Geheimnis entdeckt','Das versteckte Easter-Egg gefunden',secret],['🔥','Serienjäger','Heute mindestens 3 Abschlüsse',getDailyGoal().count>=3],['👑','Galaktischer Meister','Droiden, Fusionen, Ikonen und Rebirth zu 100 %',all(d)&&all(f)&&all(i)&&all(r)]];
+  const ach=[['🏅','Erster Schritt','Den ersten Eintrag abgeschlossen',d.done+f.done+i.done>0],['🤖','Droidensammler','50 Droid-Varianten abgeschlossen',d.done>=50],['⚡','Fusion Master','Alle Fusionen abgeschlossen',all(f)],['⭐','Ikonenjäger','Alle Ikonen gefunden',all(i)],['🔐','Geheimnis entdeckt','Das versteckte Easter-Egg gefunden',secret],['🔥','Serienjäger','Heute mindestens 3 Abschlüsse',getDailyGoal().count>=3],['👑','Galaktischer Meister','Droiden, Fusionen und Ikonen zu 100 %',all(d)&&all(f)&&all(i)]];
   el.innerHTML=ach.map(a=>`<article class="achievement ${a[3]?'unlocked':'locked'}"><span>${a[3]?a[0]:'🔒'}</span><div><b>${a[1]}</b><small>${a[2]}</small></div>${a[3]?'<strong>✓</strong>':'<em>???</em>'}</article>`).join('');
 }
 function initWalDashboard(){
@@ -348,13 +383,13 @@ function renderEventRadar(){
   const drops=[['⭐','Stellar-Drop',[5,35]],['🔷','Kyber-Drop',[15]],['💗','Mythic-Drop',[55]]];
   function nextM(mins){for(let h=0;h<4;h++)for(const m of mins){const t=new Date(now);t.setHours(now.getHours()+h,m,0,0);if(t>now)return t}return null}
   drops.forEach(d=>{const t=nextM(d[2]);if(t)items.push({type:'drop',icon:d[0],name:d[1],time:t,detail:t.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})})});
-  const mini=[['🎧','DJ-R3X Tanzparty',2,[[16,19],[21,24]]],['📦','Mega-Crate Mini-Event',4,[[16,19],[21,24]]]];
+  const mini=[['🎧','DJ-R3X Tanzparty',2,[[16,19],[26,29]]],['📦','Mega-Crate Mini-Event',4,[[16,19],[26,29]]]];
   mini.forEach(e=>{for(let day=0;day<=7;day++){const base=new Date(now);base.setDate(now.getDate()+day);base.setHours(0,0,0,0);if(base.getDay()!==e[2])continue;for(const se of e[3]){const t=new Date(base);t.setHours(se[0],0,0,0);if(t>now){items.push({type:'event',icon:e[0],name:e[1],time:t,detail:t.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'})+' · '+t.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})});day=8;break}}}});
   items.sort((a,b)=>a.time-b.time);const shown=items.slice(0,5);const rn=document.getElementById('radarNow');if(rn)rn.textContent=now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-  el.innerHTML=shown.map((x,i)=>`<div class="radar-row ${i===0?'radar-next':''}"><span class="radar-icon">${x.icon}</span><div><b>${x.name}</b><small>${x.type==='event'?'MINI-EVENT':'BLUEPRINT-DROP'} · ${x.detail}</small></div><strong>${formatShortCountdown(x.time-now)}</strong></div>`).join('');
+  el.innerHTML=shown.map((x,i)=>`<div class="radar-row ${i===0?'radar-next':''}"><span class="radar-track"><i></i></span><span class="radar-icon">${x.icon}</span><div><b>${x.name}</b><small>${x.type==='event'?'MINI-EVENT':'BLUEPRINT-DROP'} · ${x.detail}</small></div><strong>${formatShortCountdown(x.time-now)}</strong></div>`).join('');
 }
 function formatShortCountdown(ms){const s=Math.max(0,Math.floor(ms/1000)),d=Math.floor(s/86400),h=Math.floor((s%86400)/3600),m=Math.floor((s%3600)/60),sec=s%60;return d?`${d}T ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`}
-function resetAllProgress(){if(!confirm('Wirklich ALLE Tracker-Fortschritte, Achievements und Einstellungen auf diesem Gerät löschen?'))return;['droids','fusionen','icons','rebirth','rebirth-c1','rebirth-c2','rebirth-c3','rebirth-c4','rebirth-c5','activity','secret','sound','checklist-settings','home-clean'].forEach(k=>localStorage.removeItem(STORE+'-'+k));location.reload();}
+function resetAllProgress(){if(!confirm('Wirklich ALLE Tracker-Fortschritte, Achievements und Einstellungen auf diesem Gerät löschen?'))return;['droids','fusionen','icons','rebirth','rebirth-c1','rebirth-c2','rebirth-c3','rebirth-c4','rebirth-c5','activity','secret','sound','checklist-settings','home-clean','favorites'].forEach(k=>localStorage.removeItem(STORE+'-'+k));location.reload();}
 
 function initHomeCleanMode(){
   const btn=document.getElementById('homeCleanToggle'), advanced=document.getElementById('advancedHome'); if(!btn||!advanced)return;
@@ -374,14 +409,23 @@ function initCommandCenter(){
     function doSearch(){const q=search.value.trim().toLowerCase(); if(!q){results.innerHTML='<div class="search-empty">SCAN BEREIT // Suche nach Droid, Fusion oder Ikone</div>';return;} const found=all.filter(x=>x.name.toLowerCase().includes(q)).slice(0,8); results.innerHTML=found.length?found.map(x=>`<a href="${x.url}?q=${encodeURIComponent(x.name)}"><b>${esc(x.name)}</b><small>${esc(x.cat)}</small><span>→</span></a>`).join(''):'<div class="search-empty">KEIN TREFFER // Datenbankeintrag nicht gefunden</div>';}
     search.addEventListener('input',doSearch); doSearch();
   }
-  renderCommanderStatus(); renderNextMission(); initDropTimers(); initMiniEventTimers();
+  renderCommanderStatus(); renderNextMission(); initDropTimers();
 }
 
+function renderNextGoals(){
+  const el=document.getElementById('nextGoals'); if(!el)return;
+  const fav=favoriteLoad(), goals=[];
+  const addTracker=(kind,label,items,variants,url,icon)=>{const st=stateLoad(kind);items.forEach((it,idx)=>{const key=it.name+'#'+idx,missing=variants.filter(v=>!st[key+'|'+v]);if(!missing.length)return;goals.push({kind,name:it.name,label,url,icon,missing:missing.length,total:variants.length,favorite:!!fav[favoriteKey(kind,it.name)]})})};
+  addTracker('droids','DROID',D.droids,D.variants,'droids.html','🤖');addTracker('fusionen','FUSION',D.fusionDroids,D.variants,'fusionen.html','⚡');
+  const is=stateLoad('icons');(D.icons||[]).forEach((it,idx)=>{if(!is[it.name+'#'+idx])goals.push({kind:'icons',name:it.name,label:'IKONE',url:'ikonen.html',icon:'⭐',missing:1,total:1,favorite:!!fav[favoriteKey('icons',it.name)]})});
+  goals.sort((a,b)=>Number(b.favorite)-Number(a.favorite)||a.missing-b.missing||a.name.localeCompare(b.name,'de'));
+  const shown=goals.slice(0,3);
+  el.innerHTML=shown.length?shown.map(g=>`<a class="goal-card ${g.favorite?'goal-favorite':''}" href="${g.url}?q=${encodeURIComponent(g.name)}"><span class="goal-icon">${g.icon}</span><div><small>${g.favorite?'★ FAVORIT · ':''}${g.label}</small><b>${esc(g.name)}</b><em>${g.missing===1?'Noch 1 Eintrag offen':`Noch ${g.missing} Varianten offen`}</em></div><strong>→</strong></a>`).join(''):'<div class="goals-complete">✓ Alle Sammlungsziele abgeschlossen.</div>';
+}
 function renderCommanderStatus(){
   const el=document.getElementById('commanderStatus'); if(!el)return;
   const ps=[getTrackerProgress('droids',D.droids,D.variants),getTrackerProgress('fusionen',D.fusionDroids,D.variants),getIconProgress(D.icons)];
-  const rb=getRebirthProgress();
-  const done=ps.reduce((a,p)=>a+p.done,0)+rb.done, total=ps.reduce((a,p)=>a+p.total,0)+rb.total, pct=total?done/total*100:0;
+  const done=ps.reduce((a,p)=>a+p.done,0), total=ps.reduce((a,p)=>a+p.total,0), pct=total?done/total*100:0;
   const ranks=[[0,'ANFÄNGER'],[10,'DROIDEN-SCOUT'],[30,'FUSIONS-TECHNIKER'],[50,'GALAXIE-SAMMLER'],[75,'DROID-TYCOON'],[100,'GALAKTISCHER MEISTER']];
   let rank=ranks[0][1]; ranks.forEach(r=>{if(pct>=r[0])rank=r[1]});
   el.innerHTML=`<span class="rank-kicker">COMMANDER STATUS</span><strong>${rank}</strong><small>${Math.round(pct)}% GALAXY SECURED // ${done}/${total}</small>`;
@@ -390,11 +434,9 @@ function renderNextMission(){
   const el=document.getElementById('nextMission'); if(!el)return;
   const d=getTrackerProgress('droids',D.droids,D.variants), f=getTrackerProgress('fusionen',D.fusionDroids,D.variants), i=getIconProgress(D.icons);
   let m;
-  const r=getRebirthProgress();
   if(d.pct<100)m={tag:'DROIDEN-ARCHIV',title:`Noch ${d.total-d.done} Varianten warten`,desc:'Scanne das Archiv und sichere die nächste Droiden-Variante.',url:'droids.html'};
   else if(f.pct<100)m={tag:'FUSIONSLABOR',title:`Noch ${f.total-f.done} Varianten offen`,desc:'Die nächste Fusion wartet bereits auf ihre Zutaten.',url:'fusionen.html'};
   else if(i.pct<100)m={tag:'IKONEN-TRESOR',title:`Noch ${i.total-i.done} Ikonen fehlen`,desc:'Nur noch wenige Einträge bis zum vollständigen Tresor.',url:'ikonen.html'};
-  else if(r.pct<100)m={tag:'REBIRTH-PROTOKOLL',title:`Noch ${r.total-r.done} Schritte offen`,desc:'Deine nächste große Reise beginnt im Rebirth-Protokoll.',url:'rebirth.html'};
   else m={tag:'GALAKTISCHER MEISTER',title:'Die komplette Galaxie ist gesichert',desc:'100 % erreicht. Du hast den Tracker vollständig abgeschlossen.',url:'index.html'};
   el.innerHTML=`<span class="mission-tag">${m.tag}</span><h3>${m.title}</h3><p>${m.desc}</p><a class="mission-btn" href="${m.url}">MISSION STARTEN →</a>`;
 }
@@ -414,8 +456,8 @@ function initMiniEventTimers(){
   const cards=document.querySelectorAll('[data-mini-event]'); if(!cards.length)return;
   // Aktueller Stand: Dienstag Dance Party und Donnerstag Mega-Crate Mini-Event.
   const events={
-    dienstag:{day:2,sessions:[[16,19],[21,24]],name:'DJ-R3X Tanzparty'},
-    donnerstag:{day:4,sessions:[[16,19],[21,24]],name:'Mega-Crate Mini-Event'}
+    dienstag:{day:2,sessions:[[16,19],[26,29]],name:'DJ-R3X Tanzparty'},
+    donnerstag:{day:4,sessions:[[16,19],[26,29]],name:'Mega-Crate Mini-Event'}
   };
   function getSession(ev,now){
     const day=now.getDay();
@@ -424,7 +466,7 @@ function initMiniEventTimers(){
       const base=new Date(now);base.setDate(now.getDate()+delta);base.setHours(0,0,0,0);
       for(const [start,end] of ev.sessions){
         const a=new Date(base);a.setHours(start,0,0,0);
-        const b=new Date(base);b.setHours(end===24?0:end,0,0,0);if(end===24)b.setDate(b.getDate()+1);
+        const b=new Date(base);b.setHours(end,0,0,0);
         if(delta===0&&now>=a&&now<b)return {state:'live',start:a,end:b};
         if(a>now)return {state:'next',start:a,end:b};
       }
@@ -436,4 +478,25 @@ function initMiniEventTimers(){
   tick();setInterval(tick,1000);
 }
 
+function getOpenGoals(){
+  const fav=favoriteLoad(),goals=[];
+  const add=(kind,label,items,variants,url,icon)=>{const st=stateLoad(kind);items.forEach((it,idx)=>{const key=it.name+'#'+idx,missingVariants=variants.filter(v=>!st[key+'|'+v]);if(missingVariants.length)goals.push({kind,label,name:it.name,url,icon,missing:missingVariants.length,missingVariants,total:variants.length,favorite:!!fav[favoriteKey(kind,it.name)]})})};
+  add('droids','Droid',D.droids,D.variants,'droids.html','🤖');add('fusionen','Fusion',D.fusionDroids,D.variants,'fusionen.html','⚡');const st=stateLoad('icons');(D.icons||[]).forEach((it,idx)=>{if(!st[it.name+'#'+idx])goals.push({kind:'icons',label:'Ikone',name:it.name,url:'ikonen.html',icon:'⭐',missing:1,missingVariants:['Ikone'],total:1,favorite:!!fav[favoriteKey('icons',it.name)]})});return goals;
+}
+function todayActivity(){let list=[];try{list=JSON.parse(localStorage.getItem(STORE+'-activity')||'[]')}catch{}const now=new Date();return list.filter(x=>new Date(x.time).toDateString()===now.toDateString())}
+function getNextDropInfo(){const now=new Date(),defs=[{name:'STELLAR',icon:'⭐',mins:[5,35]},{name:'KYBER',icon:'🔷',mins:[15]},{name:'MYTHIC',icon:'💗',mins:[55]}],all=[];defs.forEach(d=>{for(let h=0;h<3;h++)for(const m of d.mins){const t=new Date(now);t.setHours(now.getHours()+h,m,0,0);if(t>now){all.push({...d,time:t,ms:t-now});break}}});return all.sort((a,b)=>a.time-b.time)[0]||null}
+function getAreaStats(){const d=getTrackerProgress('droids',D.droids,D.variants),f=getTrackerProgress('fusionen',D.fusionDroids,D.variants),i=getIconProgress(D.icons);return [{kind:'droids',label:'Droiden',pct:d.pct,url:'droids.html',icon:'🤖'},{kind:'fusionen',label:'Fusionen',pct:f.pct,url:'fusionen.html',icon:'⚡'},{kind:'icons',label:'Ikonen',pct:i.pct,url:'ikonen.html',icon:'⭐'}]}
+function scoreGoals(goals){const activity=todayActivity();const recent=new Set(activity.slice(0,12).map(x=>String(x.label||'').toLowerCase()));const backlog=[...getAreaStats()].sort((a,b)=>a.pct-b.pct)[0];return goals.map(g=>{let score=0,reasons=[];if(g.favorite){score+=60;reasons.push('★ Favorit')}if(g.missing===1){score+=45;reasons.push('nur 1 offen')}else if(g.missing===2){score+=28;reasons.push('fast fertig')}else score+=Math.max(0,16-g.missing*2);if(g.kind===backlog.kind){score+=16;reasons.push('größter Rückstand')}if(recent.has(g.name.toLowerCase())){score-=12;reasons.push('heute schon bearbeitet')}return {...g,score,reasons}}).sort((a,b)=>b.score-a.score||a.missing-b.missing||a.name.localeCompare(b.name,'de'))}
+function getAdaptiveRoute(){const goals=scoreGoals(getOpenGoals()),drop=getNextDropInfo(),backlog=[...getAreaStats()].sort((a,b)=>a.pct-b.pct)[0],route=[];const used=new Set();const take=(g,why)=>{if(!g||used.has(g.kind+'|'+g.name))return;used.add(g.kind+'|'+g.name);route.push({...g,why})};take(goals.find(g=>g.favorite), 'Favorisiertes Ziel zuerst');take(goals.find(g=>g.missing===1), 'Schneller Abschluss');take(goals.find(g=>g.kind===backlog.kind), `${backlog.label} haben aktuell den größten Rückstand`);goals.forEach(g=>{if(route.length<3)take(g,g.reasons[0]||'Gute Fortschrittswirkung')});return {route:route.slice(0,3),drop,backlog}}
+function renderAdaptiveRoute(){const root=document.getElementById('sessionRoute'),ctx=document.getElementById('routeContext');if(!root)return;const x=getAdaptiveRoute();if(ctx){const soon=x.drop&&x.drop.ms<=15*60*1000;ctx.innerHTML=`<span>${x.backlog.icon} Fokusbereich: <b>${x.backlog.label}</b> (${x.backlog.pct}%)</span>${x.drop?`<span class="${soon?'context-hot':''}">${x.drop.icon} ${x.drop.name}-Drop in <b>${formatShortCountdown(x.drop.ms)}</b>${soon?' · bald!':''}</span>`:''}`};root.innerHTML=x.route.length?x.route.map((g,i)=>`<a class="route-step" href="${g.url}?q=${encodeURIComponent(g.name)}"><span class="route-index">0${i+1}</span><span class="route-icon">${g.icon}</span><div><small>${esc(g.label.toUpperCase())} // ${esc(g.why)}</small><b>${esc(g.name)}</b><em>${g.missing===1?'1 Eintrag fehlt':`${g.missing} Varianten fehlen`}</em></div><strong>ÖFFNEN →</strong></a>`).join(''):'<div class="goals-complete">✓ Keine offene Route – alle Sammlungsziele abgeschlossen.</div>'}
+function assistantResponse(mode){const goals=getOpenGoals(),ranked=scoreGoals(goals),a=todayActivity(),route=getAdaptiveRoute(),drop=route.drop;let html='';if(mode==='missing')html=goals.length?`Noch <b>${goals.length}</b> Sammlungsziele sind offen. DT-01 priorisiert aktuell <b>${esc(ranked[0].name)}</b>, weil ${esc(ranked[0].reasons.join(', ')||'es gut in deinen Fortschritt passt')}.`:'Alle Sammlungsziele sind vollständig.';if(mode==='favorites'){const f=ranked.filter(x=>x.favorite);html=f.length?`Deine offenen Favoriten: ${f.slice(0,4).map(x=>`<b>${esc(x.name)}</b>`).join(', ')}.`:'Du hast aktuell keine offenen Favoriten.'}if(mode==='near'){const n=ranked.filter(x=>x.missing<=2);html=n.length?`Fast fertig: ${n.slice(0,4).map(x=>`<b>${esc(x.name)}</b> (${x.missing} offen)`).join(', ')}.`:'Aktuell ist kein Ziel nur 1–2 Schritte vom Abschluss entfernt.'}if(mode==='event')html=drop?`Nächster Blueprint-Drop: ${drop.icon} <b>${drop.name}</b> in <b>${formatShortCountdown(drop.ms)}</b>.`:'Der Event-Radar ist gerade nicht verfügbar.';if(mode==='today')html=a.length?`Heute hast du <b>${a.length}</b> Einträge gesichert: ${a.slice(0,3).map(x=>esc(x.label)).join(', ')}${a.length>3?' …':''}`:'Heute wurde noch kein neuer Eintrag gesichert.';if(mode==='quick'){const q=ranked.filter(x=>x.missing<=2).slice(0,3);html=q.length?`Deine schnellsten Abschlüsse: ${q.map((x,i)=>`<b>${i+1}. ${esc(x.name)}</b> (${x.missing} offen)`).join(' · ')}.`:'Keine besonders schnellen 1–2-Schritt-Ziele gefunden.'}if(mode==='backlog'){const b=route.backlog;html=`Dein größter Rückstand liegt bei <b>${b.label}</b> mit <b>${b.pct}%</b>. DT-01 gewichtet Ziele aus diesem Bereich etwas höher.`}if(mode==='route')html=route.route.length?`Empfohlene Route: ${route.route.map((x,i)=>`<b>${i+1}. ${esc(x.name)}</b>`).join(' → ')}. Die Reihenfolge kombiniert Favoriten, schnelle Abschlüsse und Rückstand.`:'Keine Route nötig – alles vollständig.';if(mode==='dropplan')html=drop?(drop.ms<=15*60*1000?`${drop.icon} <b>${drop.name}</b> kommt bereits in <b>${formatShortCountdown(drop.ms)}</b>. Empfehlung: jetzt kein großes neues Ziel anfangen; nimm einen schnellen Abschluss mit 1–2 offenen Einträgen oder halte dich für den Drop bereit.`:`Bis zum ${drop.name}-Drop sind noch <b>${formatShortCountdown(drop.ms)}</b>. Genug Zeit für ${ranked[0]?`<b>${esc(ranked[0].name)}</b>`:'ein offenes Ziel'}.`):'Keine Drop-Daten verfügbar.';return html}
+function initSmartInteractions(){
+  const smart=document.getElementById('smartCommandText'),today=document.getElementById('sessionToday'),toggle=document.getElementById('sessionToggle');
+  const renderToday=()=>{if(!today)return;const a=todayActivity(),counts={Droid:0,Fusion:0,Ikone:0};a.forEach(x=>{if(counts[x.category]!=null)counts[x.category]++});today.innerHTML=`<span class="session-pill">HEUTE <b>${a.length}</b> gesichert</span><span class="session-pill">🤖 <b>${counts.Droid}</b></span><span class="session-pill">⚡ <b>${counts.Fusion}</b></span><span class="session-pill">⭐ <b>${counts.Ikone}</b></span>`};
+  const pick=()=>{const g=scoreGoals(getOpenGoals())[0];if(!g){smart.textContent='100 % erreicht – aktuell gibt es kein offenes Sammlungsziel.';return}smart.innerHTML=`${g.icon} <b>${esc(g.name)}</b> ist aktuell DT-01s beste Empfehlung: ${g.missing===1?'nur noch 1 Eintrag':`noch ${g.missing} Varianten`} offen. <span class="smart-reason">${esc(g.reasons.join(' · ')||'hohe Fortschrittswirkung')}</span> <a href="${g.url}?q=${encodeURIComponent(g.name)}">Jetzt öffnen →</a>`};
+  document.getElementById('smartNextBtn')?.addEventListener('click',()=>{pick();renderAdaptiveRoute()});document.getElementById('refreshRoute')?.addEventListener('click',renderAdaptiveRoute);
+  const sessionKey=STORE+'-session-mode';const applySession=on=>{document.body.classList.toggle('session-mode',on);if(toggle)toggle.textContent=on?'⏹ SESSION BEENDEN':'🎮 SESSION STARTEN';localStorage.setItem(sessionKey,on?'1':'0');renderAdaptiveRoute()};if(toggle){applySession(localStorage.getItem(sessionKey)==='1');toggle.addEventListener('click',()=>applySession(!document.body.classList.contains('session-mode')))}
+  const panel=document.getElementById('droidAssistant'),answer=document.getElementById('assistantAnswer');document.getElementById('assistantToggle')?.addEventListener('click',()=>{panel.classList.toggle('open');panel.setAttribute('aria-hidden',panel.classList.contains('open')?'false':'true')});document.getElementById('assistantClose')?.addEventListener('click',()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true')});panel?.querySelectorAll('[data-assistant]').forEach(b=>b.addEventListener('click',()=>{answer.innerHTML='<span class="assistant-scan">SCANNING ARCHIVE...</span>';setTimeout(()=>answer.innerHTML=assistantResponse(b.dataset.assistant),180)}));
+  renderToday();pick();renderAdaptiveRoute();setInterval(()=>{renderAdaptiveRoute();},30000);
+}
 function showSecret(){const el=document.getElementById('secretMessage');if(!el)return;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),5000)}
