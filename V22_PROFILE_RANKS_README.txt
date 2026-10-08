@@ -1,0 +1,1 @@
+V2.2 Profil-Upgrade: 12 lokale Droiden-Avatare, sechs Sammlerränge, acht Abzeichen. Vor Nutzung der Droiden-Avatare das SQL-Migrationsskript SUPABASE_PROFILE_AVATAR_UPDATE_V22.sql ausführen. Erst auf Tracker_test veröffentlichen. Keine Änderung an bestehender Cloud-Sync-Logik. Ränge und Abzeichen basieren auf lokal geladenem Fortschritt.
