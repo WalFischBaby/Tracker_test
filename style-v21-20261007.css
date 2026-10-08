@@ -276,3 +276,11 @@ img{max-width:100%;height:auto}.rebirth-guide{width:100%;height:auto}
 .google-login-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 14px!important;margin-bottom:8px;border-radius:12px!important;background:linear-gradient(180deg,#151a20,#0b1015)!important;color:#f5f7fa!important;border:1px solid rgba(180,195,210,.36)!important;font:900 11px ui-monospace,SFMono-Regular,monospace!important;letter-spacing:.07em;cursor:pointer}
 .google-login-btn:hover{background:#182029!important;border-color:#d5e2ec!important;box-shadow:0 0 20px rgba(210,225,235,.10)!important}
 .google-mark{display:grid;place-items:center;width:23px;height:23px;border-radius:7px;background:#202832!important;color:#f5f7fa!important;font:900 14px Arial,sans-serif}
+
+/* DT-01 V2.2 preview: local, exact default droid artwork */
+.dt-droid-identity{display:flex;align-items:center;gap:12px;min-width:210px}
+.dt-droid-img,.dt-droid-placeholder{width:64px;height:64px;flex:0 0 64px;border:1px solid #315371;border-radius:12px;background:linear-gradient(135deg,#101d31,#18223b)}
+.dt-droid-img{object-fit:contain;padding:4px}
+.dt-droid-placeholder{display:grid;place-items:center;color:#67b5d0;font-size:26px}
+.dt-droid-text{min-width:0}
+@media(max-width:700px){.dt-droid-identity{gap:8px;min-width:170px}.dt-droid-img,.dt-droid-placeholder{width:46px;height:46px;flex-basis:46px}}

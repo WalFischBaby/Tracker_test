@@ -1,0 +1,1 @@
+V2.2 Bildervorschau: 66/66 Droiden, 17/17 Fusionen, 9/9 Ikonen mit lokalen Originalbildern. D-0 wurde aus D-O_Main0.webp ergänzt. Testbuild für Tracker_test; Cloud-Sync-Logik unverändert.
