@@ -5,13 +5,11 @@ const ranks=[{at:0,name:'Rekrut'},{at:10,name:'Droiden-Scout'},{at:25,name:'Gala
 let catalogPromise=null,timer=null,lastSignature='',busy=false;
 const parse=s=>{try{return JSON.parse(s||'{}')||{}}catch{return {}}};
 function catalog(){return catalogPromise??=fetch('./profile-catalog-v20.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Droiden-Katalog nicht verfügbar');return r.json()})}
-function compute(d){let total=0,max=0;const counts={};for(const [key,names] of Object.entries(d)){
- const stored=parse(localStorage.getItem(PREFIX+key));let n=0;names.forEach((name,i)=>{if(stored[name+'#'+i])n++});counts[key]=n;counts['max'+key]=names.length;total+=n;max+=names.length;
-}const percent=max?Math.round(100*total/max):0;
-const earned=[['first',total>=1],['ten',total>=10],['quarter',percent>=25],['half',percent>=50],['droids',counts.droids===counts.maxdroids&&counts.maxdroids>0],['fusions',counts.fusionen===counts.maxfusionen&&counts.maxfusionen>0],['icons',counts.icons===counts.maxicons&&counts.maxicons>0],['all',percent===100&&max>0]].filter(x=>x[1]).map(x=>x[0]);
+function compute(){const counts=window.DT01Progress.calculate();const {total,max,percent}=counts;
+const earned=[['first',total>=1],['ten',total>=10],['quarter',percent>=25],['half',percent>=50],['droids',counts.droids===counts.maxdroids&&counts.maxdroids>0],['fusions',counts.fusions===counts.maxfusions&&counts.maxfusions>0],['icons',counts.icons===counts.maxicons&&counts.maxicons>0],['all',percent===100&&max>0]].filter(x=>x[1]).map(x=>x[0]);
 return {rank_name:[...ranks].reverse().find(x=>percent>=x.at).name,rank_percent:percent,achievement_ids:earned};}
 async function refresh(){if(busy)return;const cloud=window.DT01Cloud,client=cloud?.client(),user=cloud?.user();if(!client||!user||!navigator.onLine)return;
- busy=true;try{const data=await catalog();if(cloud.user()?.id!==user.id)return;const stats=compute(data),signature=user.id+':'+JSON.stringify(stats);if(signature===lastSignature)return;
+ busy=true;try{if(cloud.user()?.id!==user.id)return;const stats=compute(),signature=user.id+':'+JSON.stringify(stats);if(signature===lastSignature)return;
  // Do not create a profile: usernames are always chosen by the member. Only derived fields are changed.
  const {data:existing,error:readError}=await client.from('dt01_member_profiles').select('rank_name,rank_percent,achievement_ids').eq('user_id',user.id).maybeSingle();
  if(readError)throw readError;if(!existing)return;
