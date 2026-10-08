@@ -28,6 +28,10 @@ const found=all.filter(x=>terms.length&&terms.every(t=>normalize(x.name).include
 if(found.length)return '<b>Im Archiv gefunden</b><p>Diese Einträge stehen nicht in deiner aktuellen Liste offener Ziele:</p>'+found.map(x=>'<p>'+safe(x.name)+' '+link(x.url+'?q='+encodeURIComponent(x.name),'Öffnen')+'</p>').join('');
 return '<b>Dazu habe ich keine verlässliche Antwort im lokalen Tracker.</b><p>Versuche einen Droidennamen oder frage nach Fortschritt, fehlenden Varianten, Events, Rebirth oder Upgrades. Externe Spieldaten werden nicht automatisch recherchiert.</p>';
 }
+// DT-01 3.2: local advisor is free and does not call Gemini.
+const advisor=document.createElement('section');advisor.className='assistant-advisor';advisor.innerHTML='<div class="advisor-title">🎯 PERSÖNLICHER DROIDEN-BERATER <small>Lokale Analyse · keine KI-Frage</small></div><div class="advisor-buttons"><button type="button" data-advisor="targets">Meine nächsten Ziele</button><button type="button" data-advisor="fusion">Offene Fusionen</button><button type="button" data-advisor="favorites">Favoriten zuerst</button></div>';
+form.parentElement.insertBefore(advisor,form);
+advisor.addEventListener('click',e=>{const b=e.target.closest('button[data-advisor]');if(!b)return;const raw=goals(),ranked=typeof scoreGoals==='function'?scoreGoals(raw):raw;const mode=b.dataset.advisor;const selected=mode==='fusion'?ranked.filter(g=>g.kind==='fusionen'):mode==='favorites'?ranked.filter(g=>g.favorite):ranked;out.innerHTML=renderGoals(selected,mode==='fusion'?'Deine offenen Fusionen':mode==='favorites'?'Deine offenen Favoriten':'Deine empfohlenen Sammelziele')+'<p class="advisor-disclaimer">Priorisiert nach den im Tracker vorhandenen Daten; keine Aussage über unbekannte Spielanforderungen.</p>';});
 const history=[];
 const endpoint='https://mmitxiaidgvifxzqqrae.supabase.co/functions/v1/dt01-assistant';
 const client=()=>window.DT01Cloud?.client?.();
@@ -40,7 +44,7 @@ const askAI=async(question)=>{
  const c=client();if(!c)throw Error('Cloud-Verbindung nicht bereit');
  const {data:{session}}=await c.auth.getSession();if(!session?.access_token)throw Error('Bitte melde dich an, um die KI zu nutzen.');
  const stats=typeof getAreaStats==='function'?getAreaStats().map(x=>({bereich:x.label,prozent:x.pct})):[];
- const goals=(typeof scoreGoals==='function'&&typeof getOpenGoals==='function'?scoreGoals(getOpenGoals()):typeof getOpenGoals==='function'?getOpenGoals():[]).slice(0,12).map(g=>({name:g.name,bereich:g.label,offen:g.missing}));
+ const goals=(typeof scoreGoals==='function'&&typeof getOpenGoals==='function'?scoreGoals(getOpenGoals()):typeof getOpenGoals==='function'?getOpenGoals():[]).slice(0,12).map(g=>({name:g.name,bereich:g.label,offen:g.missing,typ:g.kind||"",favorit:!!g.favorite}));
  const r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':'sb_publishable_LPRZBZLoQsPm_P2olo7ESA_EYK3f_Cu'},body:JSON.stringify({question,history:history.slice(-6),context:{stats,goals}})});
  const payload=await r.json().catch(()=>({}));if(!r.ok)throw Error(payload.error||'KI vorübergehend nicht erreichbar');
  history.push({role:'user',text:question},{role:'assistant',text:payload.answer});if(history.length>12)history.splice(0,history.length-12);
