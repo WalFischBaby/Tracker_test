@@ -1,0 +1,8 @@
+DT-01 V2.2 Moderation TESTBUILD
+1. Zuerst SUPABASE_COMMUNITY_CHAT_V22.sql (bereits erledigt), dann SUPABASE_CHAT_MODERATION_V22.sql im Supabase SQL Editor ausfuehren.
+2. Pruefen: select user_id,role from public.dt01_chat_roles;  Admin-E-Mail muss als bestaetigter Supabase-Auth-User existieren.
+3. Kompletten ZIP-Inhalt nach Tracker_test hochladen.
+4. Chat-Regeln akzeptieren. Als Admin im Chat MODERATION aufklappen, Meldungen pruefen und Moderator per exaktem Spielername ernennen.
+5. Moderator kann Meldungen bearbeiten und sperren, aber keine Rollen vergeben.
+6. Bei Bedarf Rollenzuweisung kontrollieren, bevor der Chat auf die Produktionsseite geht.
+WICHTIG: Chat nur Testserver; Browser- und Rechte-Tests mit zwei Konten erforderlich.
