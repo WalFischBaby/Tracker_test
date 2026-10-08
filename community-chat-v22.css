@@ -24,3 +24,7 @@
 }
 .dt-chat-staff summary{position:sticky;top:0;background:#0a172b;padding:8px 0;z-index:1;}
 .dt-chat-staff button{min-height:34px;}
+
+/* DT-01 V2.0: gespeichertes Spielerprofilbild im Chat */
+.dt-chat-avatar{width:34px;height:34px;min-width:34px;overflow:hidden;border:1px solid rgba(111,231,255,.25);border-radius:10px;box-sizing:border-box}
+.dt-chat-avatar-img{display:block;width:100%;height:100%;object-fit:contain}
