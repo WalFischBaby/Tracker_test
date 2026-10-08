@@ -1,0 +1,1 @@
+Mission Control uses the same native sidebar, main header, responsive wrap and active-menu treatment as the other pages. Mission logic and existing profile/cloud logic unchanged. Upload full ZIP to Tracker_test. No Supabase changes. Browser visual QA still needed.
