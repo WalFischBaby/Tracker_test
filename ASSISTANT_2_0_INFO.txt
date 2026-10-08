@@ -1,0 +1,4 @@
+DT-01 Assistant 2.0 Testbuild
+Nur index.html erhält den neuen Frage-Assistant, da er bisher nur im Command Center existiert.
+Lokale regelbasierte Antworten auf Basis vorhandener Tracker-Daten; keine generative KI, keine neue Supabase-Tabelle, keine Datenbankänderung.
+ZIP vollständig auf Tracker_test hochladen.
