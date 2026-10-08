@@ -1,0 +1,7 @@
+DT-01 V2.2 Testbuild: Account Center + Missions-Cloud
+1. SQL aus SUPABASE_MISSIONS_V22.sql im Supabase SQL Editor ausführen.
+2. ZIP-Inhalt in Tracker_test hochladen.
+3. Auf missionen.html anmelden, Mission anlegen, zweites Gerät prüfen.
+4. Account Center öffnet das unveränderte bestehende Login-Modal.
+5. Nur Testserver verwenden; bestehende tracker_items und player_profiles bleiben unberührt.
+Hinweis: Gleichzeitige Änderungen an derselben Mission werden per Zeitstempel abgeglichen.
