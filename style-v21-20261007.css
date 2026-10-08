@@ -318,3 +318,45 @@ body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:bloc
 .release-modal{z-index:2100!important;overscroll-behavior:contain}
 .release-modal .release-dialog{max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(20px,env(safe-area-inset-bottom))}
 @media(max-width:850px){.release-modal .release-dialog{max-height:calc(100dvh - 24px);margin:12px auto}}
+
+/* V2.2 mobile navigation: all eight destinations always visible. */
+@media (max-width:850px){
+  body.terminal-v3 .mobile-bottom-nav{
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    overflow:visible!important;gap:3px!important;
+    left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom))!important;
+    padding:6px!important;z-index:1000;
+  }
+  body.terminal-v3 .mobile-bottom-nav a{
+    min-width:0!important;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;min-height:45px;padding:3px 1px!important;font-size:10px!important;line-height:1.1;
+    white-space:nowrap;touch-action:manipulation;
+  }
+  body.terminal-v3 .mobile-bottom-nav .dt-mobile-icon{font-size:17px;line-height:20px}
+  body.terminal-v3 .wrap{padding-bottom:max(155px,calc(135px + env(safe-area-inset-bottom)))!important}
+  body.terminal-v3 .dt-account-card{margin-bottom:10px}
+}
+
+/* V2.2 mobile header navigation - replaces the floating bottom bar */
+.dt-mobile-header,.dt-mobile-drawer{display:none}
+@media(max-width:850px){
+  body.terminal-v3 .mobile-bottom-nav{display:none!important}
+  body.terminal-v3 .wrap{padding-bottom:28px!important}
+  .dt-mobile-header{display:flex;position:sticky;top:0;z-index:1100;align-items:center;justify-content:space-between;gap:12px;min-height:62px;padding:9px 16px;background:rgba(5,10,24,.97);border-bottom:1px solid rgba(46,221,245,.27);backdrop-filter:blur(16px);box-sizing:border-box}
+  .dt-mobile-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:#e9faff;min-width:0}
+  .dt-mobile-logo{display:flex;align-items:baseline;gap:2px;font-weight:1000;font-size:21px;color:#51eaff;letter-spacing:-1px}
+  .dt-mobile-logo span{font-size:11px;color:#f69afa}
+  .dt-mobile-brand-name{font-size:12px;font-weight:900;letter-spacing:1px;line-height:1.15}
+  .dt-mobile-brand-name small{display:block;color:#91b7c8;font-size:9px;letter-spacing:2px}
+  .dt-mobile-menu-button{display:flex;align-items:center;gap:9px;justify-content:center;min-width:91px;min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid rgba(73,222,244,.5);background:#101b30;color:#e8faff;font-weight:800;cursor:pointer}
+  .dt-mobile-menu-button span:first-child{font-size:20px;line-height:1}
+  .dt-mobile-drawer{display:flex;flex-direction:column;position:fixed;top:62px;right:9px;left:9px;z-index:1099;max-height:calc(100dvh - 76px);overflow-y:auto;padding:14px;background:#071225;border:1px solid rgba(61,217,244,.45);border-radius:0 0 16px 16px;box-shadow:0 16px 45px rgba(0,0,0,.65);box-sizing:border-box}
+  .dt-mobile-drawer[hidden]{display:none!important}
+  .dt-mobile-drawer-heading{padding:4px 10px 12px;color:#85a9c2;font-size:10px;font-weight:900;letter-spacing:2px}
+  .dt-mobile-drawer a{display:flex;align-items:center;gap:14px;min-height:46px;padding:8px 13px;border-radius:9px;text-decoration:none;color:#d6e8f3;font-size:14px;font-weight:750;box-sizing:border-box}
+  .dt-mobile-drawer a:hover,.dt-mobile-drawer a.active{background:rgba(42,211,243,.12);color:#62e9ff}
+  .dt-drawer-icon{display:inline-flex;align-items:center;justify-content:center;width:28px;font-size:20px;flex-shrink:0}
+  .dt-current-dot{margin-left:auto;font-size:10px}
+  .assistant-toggle{bottom:20px!important}
+  .droid-assistant{bottom:76px!important}
+}

@@ -1,0 +1,1 @@
+Mobile Navigation: feste schmale Kopfzeile, Menü öffnet 8 Ziele. Desktop-Seitenleiste bleibt unverändert. Testen: Öffnen, Schließen, Escape, alle Links, Account Center, Dialoge, Hoch-/Querformat. Supabase unverändert.
