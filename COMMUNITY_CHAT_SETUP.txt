@@ -1,0 +1,8 @@
+DT-01 V2.2 Community Chat Test
+1. Supabase SQL Editor: SUPABASE_COMMUNITY_CHAT_V22.sql vollständig ausführen.
+2. ZIP-Inhalt vollständig auf Tracker_test hochladen.
+3. Test: nicht angemeldet lesen, angemeldet schreiben, zweites Gerät live prüfen.
+4. Moderatoren festlegen: insert into public.community_chat_moderators(user_id) values ('DEINE_AUTH_USER_UUID');
+5. Moderation derzeit per SQL: select id,body,created_at from public.community_messages order by id desc; select public.dt01_moderate_chat_message(ID); (RPC benötigt Moderator-Session; alternativ als Supabase-Admin: update public.community_messages set is_deleted=true where id=ID;)
+6. Meldungen im SQL Editor prüfen: select * from public.community_chat_reports order by created_at desc;
+ACHTUNG: Vor Produktivstart aktive Moderation und Datenschutz-/Community-Regeln klären.
