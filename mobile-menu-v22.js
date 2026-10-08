@@ -1,7 +1,7 @@
 (function(){
   function init(){
     if(document.querySelector('.dt-mobile-header'))return;
-    const pages=[['index.html','◉','Übersicht'],['droids.html','▣','Droiden'],['fusionen.html','◇','Fusionen'],['ikonen.html','★','Ikonen'],['rebirth.html','↻','Rebirth'],['upgrade.html','⌁','Upgrade-Rechner'],['missionen.html','◎','Mission Control'],['profil.html','♙','Mein Spielerprofil'],['index.html#dtChatCard','☏','Community-Chat']];
+    const pages=[['index.html','◉','Übersicht'],['droids.html','▣','Droiden'],['fusionen.html','◇','Fusionen'],['ikonen.html','★','Ikonen'],['rebirth.html','↻','Rebirth'],['upgrade.html','⌁','Upgrade-Rechner'],['missionen.html','◎','Mission Control'],['marktplatz.html','⇄','Marktplatz'],['nachrichten.html','✉','Private Nachrichten'],['mitglieder.html','♧','Mitglieder'],['profil.html','♙','Mein Spielerprofil'],['index.html#dtChatCard','☏','Community-Chat']];
     const current=location.pathname.split('/').pop()||'index.html';
     const bar=document.createElement('div');bar.className='dt-mobile-header';
     bar.innerHTML='<a class="dt-mobile-brand" href="./index.html" aria-label="DT-01 Startseite"><span class="dt-mobile-logo">DT<span>01</span></span><span class="dt-mobile-brand-name">DROID TYCOON <small>TRACKER</small></span></a><button class="dt-mobile-menu-button" type="button" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="dt-mobile-drawer"><span aria-hidden="true">☰</span><span>Menü</span></button>';

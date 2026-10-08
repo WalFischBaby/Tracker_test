@@ -1,0 +1,27 @@
+DT-01 V2.0 – Galaktischer Marktplatz + Privatnachrichten (TEST)
+==============================================================
+
+1. Sicherheitskopie des bestehenden GitHub-Teststandes anlegen.
+2. Supabase Dashboard > SQL Editor: marketplace-v20.sql EINMAL vollständig ausführen.
+   Vorausgesetzt: community-profiles-v20.sql wurde bereits angewendet.
+3. Die Dateien dieses ZIPs auf dem bestehenden GitHub-Testserver deployen.
+   Bitte bestehende Supabase-Konfiguration unverändert lassen.
+4. Mit mindestens zwei echten Testkonten anmelden und prüfen:
+   - Ohne Login sind Marktplatz, Mitglieder und DMs gesperrt.
+   - Je Account maximal 5 AKTIVE Wunsch-/Angebots-Einträge insgesamt.
+   - Eintrag schließen, neuer Platz frei.
+   - Geschenk, Tausch, beides sowie jede Variante auswählen.
+   - Gegenseitige Direktnachrichten und Ungelesen-Zähler.
+   - Blockieren, Entblockieren und Melden.
+   - Keine Einsicht in fremde private DMs.
+5. Erst nach Tests für weitere Mitglieder freischalten.
+
+WICHTIG:
+- Diese ZIP ändert keine bereits bereitgestellte Supabase-Datenbank automatisch.
+- Kein automatischer Versand und kein Ingame-Transfer: Übergabe organisieren Spieler selbst.
+- Nachrichtenabfrage erfolgt in Intervallen, nicht als Realtime-Abonnement.
+- Meldungen stehen in public.dt01_dm_reports und können von Admins im Supabase Dashboard geprüft werden. Eine separate Moderator-Oberfläche ist noch nicht enthalten.
+- Variante und Droidenname stammen im Formular aus den bestehenden Tracker-Daten. Das SQL validiert Variantennamen, Länge und Rechte; eine vollständige serverseitige Droiden-Katalogprüfung ist noch nicht enthalten.
+- Das Nachrichten- und Angebots-Limit ist getrennt: Maximal 5 AKTIVE Marktplatz-Einträge, keine Begrenzung der privaten Nachrichten auf 5.
+- Änderungen an anderen Tracker-Daten oder bestehenden Rebirth-Grafiken sind nicht vorgenommen worden.
+- Für die produktive Freigabe zusätzlich Datenschutzinformationen und Aufbewahrungsregeln für DMs/Meldungen ergänzen.

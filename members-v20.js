@@ -125,6 +125,7 @@ function show(p){
   if(!socials.children.length)socials.append(el('p','member-card-caption','Keine Gaming-Namen hinterlegt.'));
   dossier.append(socials);
 
+  const dm=el('a','mission-btn','✉ PRIVATE NACHRICHT');dm.href='./nachrichten.html?to='+encodeURIComponent(p.user_id);if(user?.id!==p.user_id)dossier.append(dm);
   layout.append(display,dossier);
   root.append(layout);
   modal.hidden=false;
