@@ -31,6 +31,11 @@ return '<b>Dazu habe ich keine verlässliche Antwort im lokalen Tracker.</b><p>V
 const history=[];
 const endpoint='https://mmitxiaidgvifxzqqrae.supabase.co/functions/v1/dt01-assistant';
 const client=()=>window.DT01Cloud?.client?.();
+const quotaBox=document.getElementById('assistantQuota'),quotaText=document.getElementById('assistantQuotaText'),quotaBar=document.getElementById('assistantQuotaBar'),quotaHint=document.getElementById('assistantQuotaHint');
+const showQuota=(used,limit=10)=>{if(!quotaBox)return;const n=Math.max(0,Math.min(limit,Number(used)||0));quotaText.textContent=n+' / '+limit;quotaBar.style.width=(n/limit*100)+'%';quotaBox.classList.toggle('exhausted',n>=limit);quotaHint.textContent=n>=limit?'Tageslimit erreicht · lokale Hilfe bleibt verfügbar':(limit-n)+' KI-Fragen verbleibend · Reset um 00:00 UTC';};
+async function refreshQuota(){const c=client();if(!c)return;try{const {data:{session}}=await c.auth.getSession();if(!session?.access_token){if(quotaText)quotaText.textContent='Anmeldung nötig';if(quotaHint)quotaHint.textContent='Melde dich an, um KI-Fragen zu nutzen.';return;}const r=await fetch(endpoint,{method:'GET',headers:{'Authorization':'Bearer '+session.access_token,'apikey':'sb_publishable_LPRZBZLoQsPm_P2olo7ESA_EYK3f_Cu'}});if(!r.ok)throw Error('nicht verfügbar');const data=await r.json();showQuota(data.used,data.limit||10);}catch(e){if(quotaText)quotaText.textContent='– / 10';if(quotaHint)quotaHint.textContent='Zähler nicht verfügbar · KI-Funktion bleibt erhalten';}}
+setTimeout(refreshQuota,400);document.getElementById('assistantToggle')?.addEventListener('click',()=>setTimeout(refreshQuota,150));
+
 const askAI=async(question)=>{
  const c=client();if(!c)throw Error('Cloud-Verbindung nicht bereit');
  const {data:{session}}=await c.auth.getSession();if(!session?.access_token)throw Error('Bitte melde dich an, um die KI zu nutzen.');
@@ -43,6 +48,6 @@ const askAI=async(question)=>{
 };
 form.addEventListener('submit',async e=>{e.preventDefault();const q=input.value.trim();if(!q)return;
  const btn=form.querySelector('button[type="submit"]');btn.disabled=true;out.textContent='🤖 DT-01 denkt nach …';
- try{const answer=await askAI(q);out.textContent=answer;}catch(err){out.innerHTML='<p><b>KI nicht verfügbar:</b> '+safe(err.message)+'</p><p>Lokale Antwort:</p>'+reply(q)}finally{btn.disabled=false;}
+ try{const answer=await askAI(q);out.textContent=answer;}catch(err){const limit=String(err.message).includes('Tageslimit');out.innerHTML=limit?'<p><b>🐳 Deine 10 KI-Fragen für heute sind aufgebraucht.</b> Morgen kannst du wieder fragen. Bis dahin hilft dir der lokale Assistent:</p>'+reply(q):'<p><b>KI vorübergehend nicht erreichbar:</b> '+safe(err.message)+'</p><p>Lokale Hilfe:</p>'+reply(q);}finally{btn.disabled=false;refreshQuota();}
 });
 })();
