@@ -1,0 +1,4 @@
+DT-01 V2.2 – Werkzeuge neu positioniert
+Desktop: Updates, Feedback und Assistant links unten statt über dem Community-Chat rechts.
+Smartphone: Updates und Feedback am Seitenende im normalen Dokumentfluss. Assistant links unten mit scrollbarem Dialog.
+Supabase: keine Änderungen.

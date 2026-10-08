@@ -360,3 +360,17 @@ body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:bloc
   .assistant-toggle{bottom:20px!important}
   .droid-assistant{bottom:76px!important}
 }
+
+/* V2.2: Utility actions stay clear of the right-side community chat/moderation. */
+@media (min-width:851px){
+  body.terminal-v3 .release-tools{left:110px!important;right:auto!important;bottom:18px!important;z-index:85!important;max-width:calc(100vw - 420px);flex-wrap:wrap}
+  body.terminal-v3 .assistant-toggle{left:110px!important;right:auto!important;bottom:76px!important}
+  body.terminal-v3 .droid-assistant{left:110px!important;right:auto!important;bottom:140px!important;max-height:calc(100dvh - 160px);overflow-y:auto}
+}
+@media (max-width:850px){
+  /* Updates and feedback become ordinary page-end controls, not floating overlays. */
+  body.terminal-v3 .release-tools{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;top:auto!important;display:flex!important;justify-content:center!important;flex-wrap:wrap!important;width:calc(100% - 24px)!important;margin:16px auto 28px!important;z-index:5!important}
+  body.terminal-v3 .release-tools button{min-height:44px!important;flex:1 1 125px!important;max-width:220px}
+  body.terminal-v3 .assistant-toggle{left:14px!important;right:auto!important;bottom:14px!important;z-index:90!important}
+  body.terminal-v3 .droid-assistant{left:12px!important;right:12px!important;bottom:78px!important;top:auto!important;width:auto!important;max-height:calc(100dvh - 100px)!important;overflow-y:auto!important;z-index:95!important}
+}
