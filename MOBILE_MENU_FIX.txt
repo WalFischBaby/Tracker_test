@@ -1,0 +1,1 @@
+Mobile Navigation einheitlich auf allen acht Seiten. Alte Bottom-Navigation aus HTML entfernt. Cache-Busting für Stylesheet und Menue-Script. Desktop unveraendert.
