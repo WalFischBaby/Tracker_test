@@ -297,3 +297,7 @@ body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:bloc
 @media(min-width:1400px){.dt-account-card{width:260px;right:24px}}
 @media(max-width:1350px){.dt-account-card{position:relative;top:auto;right:auto;width:min(100% - 36px,620px);margin:14px auto 0;z-index:5;grid-template-columns:1fr auto;align-items:center}.dt-account-heading{grid-column:1/-1}.dt-account-person{grid-column:1}.dt-account-card button{grid-column:2}.dt-account-card a{grid-column:1/-1}}
 @media(max-width:650px){.dt-account-card{width:calc(100% - 20px);margin:10px auto;grid-template-columns:1fr}.dt-account-person,.dt-account-card button,.dt-account-card a{grid-column:1}}
+
+/* V2.2 mobile account accessibility: account before main, never behind fixed bottom navigation. */
+@media(max-width:1350px){body.terminal-v3>.dt-account-card{position:relative;top:auto;bottom:auto;right:auto;left:auto;z-index:2;clear:both}}
+@media(max-width:850px){body.terminal-v3>.dt-account-card{margin:14px auto 10px;width:calc(100% - 24px);padding:16px;max-width:620px}body.terminal-v3>.dt-account-card button{min-height:44px;touch-action:manipulation}body.terminal-v3>.dt-account-card a{min-height:36px;display:grid;place-items:center}body.terminal-v3>.dt-account-card a[hidden]{display:none}}

@@ -1,0 +1,1 @@
+Mobile Account Center Fix: Account-Karte vor main statt nach der unteren Navigation; Touch-Ziele vergroessert; Cache-Version erneuert. Keine Datenbank-Aenderung.
