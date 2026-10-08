@@ -284,3 +284,8 @@ img{max-width:100%;height:auto}.rebirth-guide{width:100%;height:auto}
 .dt-droid-placeholder{display:grid;place-items:center;color:#67b5d0;font-size:26px}
 .dt-droid-text{min-width:0}
 @media(max-width:700px){.dt-droid-identity{gap:8px;min-width:170px}.dt-droid-img,.dt-droid-placeholder{width:46px;height:46px;flex-basis:46px}}
+
+/* V2.2 Mission Control: same centered icon/label stack as every other rail entry */
+body.terminal-v3 .terminal-rail nav a[href="./missionen.html"]{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px;box-sizing:border-box;}
+body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] i{display:block;width:100%;text-align:center;line-height:22px;}
+body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:block;width:100%;text-align:center;line-height:1.35;white-space:normal;overflow-wrap:normal;word-break:normal;}

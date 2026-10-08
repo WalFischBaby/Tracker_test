@@ -1,0 +1,1 @@
+Nur Darstellungsfix: Mission Control im linken Menü mit zentriertem Symbol und zentrierter Beschriftung (ggf. zweizeilig). Alle übrigen Funktionen unverändert. ZIP-Inhalt auf Tracker_test hochladen.
