@@ -26,7 +26,7 @@ async function load(){const request=++token;const panel=card();if(!panel)return;
       if(request!==token||currentId!==user.id)return;
       if(!signError)src=signed?.signedUrl||'';
     }
-    if(src){const img=document.createElement('img');img.alt='Dein Profilbild';img.src=src;img.onerror=()=>{img.remove();holder.textContent='🤖'};holder.append(img)}
+    if(src){const img=document.createElement('img');img.alt='Dein Profilbild';img.src=src+(src.includes('?')?'&':'?')+'dt01avatar='+Math.floor(Date.now()/60000);img.onerror=()=>{img.remove();holder.textContent='🤖'};holder.append(img)}
     else holder.textContent='🤖';
   }catch(e){console.warn('Account-Profil konnte nicht geladen werden.',e);const n=card()?.querySelector('[data-account-name]');if(n)n.textContent='Spielerprofil';initials()}
 }
