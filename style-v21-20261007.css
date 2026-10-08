@@ -301,3 +301,20 @@ body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:bloc
 /* V2.2 mobile account accessibility: account before main, never behind fixed bottom navigation. */
 @media(max-width:1350px){body.terminal-v3>.dt-account-card{position:relative;top:auto;bottom:auto;right:auto;left:auto;z-index:2;clear:both}}
 @media(max-width:850px){body.terminal-v3>.dt-account-card{margin:14px auto 10px;width:calc(100% - 24px);padding:16px;max-width:620px}body.terminal-v3>.dt-account-card button{min-height:44px;touch-action:manipulation}body.terminal-v3>.dt-account-card a{min-height:36px;display:grid;place-items:center}body.terminal-v3>.dt-account-card a[hidden]{display:none}}
+
+/* V2.2 mobile layout refinement: account belongs to the content flow. */
+@media(max-width:1100px){
+  body.terminal-v3 main.wrap > .dt-account-card,
+  main.wrap > .dt-account-card{position:relative!important;inset:auto!important;transform:none!important;float:none!important;width:100%!important;max-width:none!important;margin:0 0 18px!important;z-index:1!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;box-sizing:border-box!important}
+  main.wrap > .dt-account-card .dt-account-person,
+  main.wrap > .dt-account-card button,
+  main.wrap > .dt-account-card a{grid-column:1/-1!important}
+  main.wrap > .dt-account-card button{min-height:48px!important;font-size:13px!important}
+  main.wrap > .dt-account-card a:not([hidden]){min-height:44px!important;display:grid!important;place-items:center}
+  main.wrap > .dt-account-card a[hidden]{display:none!important}
+  body.terminal-v3 main.wrap{padding-bottom:max(115px,calc(95px + env(safe-area-inset-bottom)))!important}
+}
+/* Dialogs must always sit above the fixed mobile navigation, with scrollable actions. */
+.release-modal{z-index:2100!important;overscroll-behavior:contain}
+.release-modal .release-dialog{max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+@media(max-width:850px){.release-modal .release-dialog{max-height:calc(100dvh - 24px);margin:12px auto}}

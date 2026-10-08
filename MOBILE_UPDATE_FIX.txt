@@ -1,0 +1,1 @@
+DT-01 V2.2: Update-Popup startet nicht mehr automatisch; Updates-Button bleibt. Auch V2.1-Willkommenspopup wird nicht automatisch gezeigt. Account Center sitzt mobil im normalen Hauptinhalt und kann nicht von der unteren Navigation verdeckt werden. Modals haben Vorrang und sind scrollbar. Supabase unverändert.
