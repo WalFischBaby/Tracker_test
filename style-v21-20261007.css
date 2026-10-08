@@ -374,3 +374,11 @@ body.terminal-v3 .terminal-rail nav a[href="./missionen.html"] span{display:bloc
   body.terminal-v3 .assistant-toggle{left:14px!important;right:auto!important;bottom:14px!important;z-index:90!important}
   body.terminal-v3 .droid-assistant{left:12px!important;right:12px!important;bottom:78px!important;top:auto!important;width:auto!important;max-height:calc(100dvh - 100px)!important;overflow-y:auto!important;z-index:95!important}
 }
+
+/* V2.2: updates and feedback in navigation, no floating release tools. */
+body.terminal-v3 .release-tools{display:none!important}
+body.terminal-v3 .terminal-rail nav .dt-rail-action{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%;border:0;background:transparent;color:#a8bdd1;padding:10px 3px;cursor:pointer;font:inherit;font-size:10px;font-weight:800;letter-spacing:.05em}
+body.terminal-v3 .terminal-rail nav .dt-rail-action i{font-style:normal;font-size:21px;line-height:22px}
+body.terminal-v3 .terminal-rail nav .dt-rail-action:hover,body.terminal-v3 .terminal-rail nav .dt-rail-action:focus-visible{color:#6fe7ff;background:rgba(111,231,255,.09)}
+@media(min-width:851px){body.terminal-v3 .assistant-toggle{left:auto!important;right:20px!important;bottom:20px!important}body.terminal-v3 .droid-assistant{left:auto!important;right:20px!important;bottom:84px!important;max-height:calc(100dvh - 104px)!important;overflow-y:auto}}
+@media(max-width:850px){body.terminal-v3 .assistant-toggle{left:auto!important;right:14px!important;bottom:14px!important}body.terminal-v3 .droid-assistant{left:auto!important;right:12px!important;bottom:78px!important;max-height:calc(100dvh - 100px)!important;overflow-y:auto}.dt-mobile-drawer .dt-mobile-tool{display:flex;align-items:center;gap:14px;width:100%;min-height:46px;padding:8px 13px;border:0;border-radius:9px;background:transparent;text-align:left;color:#d6e8f3;font-size:14px;font-weight:750;cursor:pointer}.dt-mobile-drawer .dt-mobile-tool:hover,.dt-mobile-drawer .dt-mobile-tool:focus-visible{background:rgba(42,211,243,.12);color:#62e9ff}.dt-mobile-tools-heading{margin-top:8px;border-top:1px solid rgba(111,231,255,.12);padding-top:14px}}

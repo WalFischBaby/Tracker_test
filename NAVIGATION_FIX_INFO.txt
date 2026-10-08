@@ -1,0 +1,1 @@
+Updates und Feedback sind in der Desktop-Seitennavigation und im mobilen Hamburger-Menü. DT-01 Assistant wieder rechts unten. Supabase unverändert. Alle Dateien hochladen, Browsercache aktualisieren.
