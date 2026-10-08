@@ -7,3 +7,20 @@
 @media(max-width:850px){main.wrap>.dt-chat-card{position:relative!important;inset:auto!important;width:100%!important;margin:0 0 18px!important;z-index:1!important}.dt-chat-messages{height:230px}}
 
 .dt-chat-accept,.dt-chat-staff{border:1px solid #35526d;border-radius:10px;padding:10px;margin-top:10px;background:#0a172b;color:#d9f4ff;font-size:11px}.dt-chat-accept[hidden],.dt-chat-staff[hidden]{display:none!important}.dt-chat-accept button,.dt-chat-staff button{background:#10364c;border:1px solid #4b9aba;color:white;border-radius:7px;padding:8px;cursor:pointer;font-size:10px;margin:3px}.dt-chat-staff summary{cursor:pointer;font-weight:800}.dt-chat-staff input{max-width:100%;box-sizing:border-box;background:#0a1a2e;color:white;border:1px solid #3e607a;padding:8px;border-radius:7px}.dt-chat-report-item{border-bottom:1px solid #294057;padding:7px 0}.dt-chat-report-item p{overflow-wrap:anywhere}.dt-chat-staff-actions{display:flex;flex-wrap:wrap}
+
+/* V2.2: Moderation bleibt im sichtbaren Bereich und ist separat scrollbar. */
+@media (min-width:1351px){
+ .dt-chat-card{max-height:calc(100dvh - 330px);min-height:180px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#477b9a #0b1528;}
+ .dt-chat-messages{height:clamp(110px,24dvh,245px);}
+ .dt-chat-staff[open]{max-height:min(42dvh,430px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+}
+@media (max-width:1350px){
+ .dt-chat-card{max-height:none;overflow:visible;}
+ .dt-chat-staff[open]{max-height:min(55dvh,520px);overflow-y:auto;overscroll-behavior:contain;}
+}
+@media (max-width:850px){
+ .dt-chat-card{margin-bottom:28px!important;}
+ .dt-chat-staff[open]{max-height:min(55dvh,520px);overflow-y:auto;}
+}
+.dt-chat-staff summary{position:sticky;top:0;background:#0a172b;padding:8px 0;z-index:1;}
+.dt-chat-staff button{min-height:34px;}
