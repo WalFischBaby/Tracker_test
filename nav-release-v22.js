@@ -1,4 +1,4 @@
-/* V2.2 – reuse the existing update/feedback modal handlers. */
+/* V2.0 – reuse the existing update/feedback modal handlers. */
 (function(){
  document.addEventListener('click',function(event){
    const action=event.target.closest('[data-release-open]');
